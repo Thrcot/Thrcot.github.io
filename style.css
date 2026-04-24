@@ -1,0 +1,398 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* BASE */
+body {
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+  background: #fff;
+  color: #000;
+  line-height: 1.8;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 48px;
+  border-bottom: 1px solid #000;
+}
+
+.logo {
+  height: 72px;
+}
+
+nav a {
+  margin-left: 32px;
+  font-family: 'Orbitron', sans-serif;
+  text-decoration: none;
+  color: #000;
+  font-weight: 600;
+}
+
+nav a:hover {
+  border-bottom: 2px solid #000;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  background: #000;
+  color: #fff;
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+}
+
+.hero-inner {
+  position: relative;
+}
+
+.hero h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  letter-spacing: 0.08em;
+}
+
+.hero p {
+  margin-top: 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+/* BACKGROUND TEXT */
+.hero::after {
+  content: "ROBOCUP / JUNIOR / INFRARED / ROBOTICS";
+  position: absolute;
+  bottom: 20px;
+  right: -50px;
+  font-family: 'Orbitron';
+  font-size: 6rem;
+  white-space: nowrap;
+  color: rgba(255,255,255,0.05);
+}
+
+/* SECTIONS */
+section {
+  padding: 100px 48px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.dark {
+  background: #000;
+  color: #fff;
+}
+
+h2 {
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 40px;
+  letter-spacing: 0.1em;
+  border-left: 6px solid currentColor;
+  padding-left: 16px;
+}
+
+h3 {
+  font-family: 'Rajdhani', sans-serif;
+  margin-top: 16px;
+}
+
+/* ROBOTS */
+.robots {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.robot-card {
+  border: 1px solid currentColor;
+  padding: 24px;
+  width: 300px;
+}
+
+.robot-card img {
+  width: 100%;
+  filter: grayscale(100%);
+}
+
+/* SPONSORS */
+.sponsor-list {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.sponsor-list img {
+  height: 150px;
+  max-width: 100%;
+  transition: 0.3s ease;
+}
+
+.sponsor-list a {
+  padding: 20px 30px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+}
+
+/* hoverは控えめに */
+.sponsor-list a:hover img {
+  transform: scale(1.05);
+}
+
+/* LINKS */
+.links {
+  list-style: none;
+}
+
+.links li {
+  margin-bottom: 16px;
+}
+
+.links a {
+  font-family: 'Orbitron', sans-serif;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* DIVIDER */
+.divider {
+  height: 120px;
+  background: #000;
+  clip-path: polygon(0 20%, 100% 0%, 100% 80%, 0% 100%);
+}
+
+.divider.invert {
+  background: #fff;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 40px;
+  border-top: 1px solid #000;
+  font-family: 'Rajdhani';
+}
+
+/* ANIMATION */
+.fade {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: 0.8s ease;
+}
+
+.fade.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* LINK ICONS */
+.link-icons {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.link-icons img {
+  height: 64px;
+  filter: grayscale(100%) brightness(0.8);
+  transition: 0.3s ease;
+}
+
+.link-icons a:hover img {
+  filter: grayscale(0%) brightness(1);
+  transform: scale(1.1);
+}
+
+/* FOOTER */
+.site-footer {
+  background: #000;
+  color: #fff;
+  padding: 60px 48px;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-left img {
+  height: 48px;
+  filter: invert(1);
+}
+
+.footer-team {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.footer-copy {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .footer-right {
+    text-align: center;
+  }
+}
+
+.site-footer {
+  position: relative;
+  overflow: hidden;
+}
+
+.site-footer::after {
+  content: "ROBOCUP / JUNIOR / INFRARED / ROBOTICS";
+  position: absolute;
+  right: -60px;
+  bottom: 10px;
+  font-family: 'Orbitron';
+  font-size: 5rem;
+  white-space: nowrap;
+  color: rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+   ========================= */
+
+/* ===== Tablet ===== */
+@media (max-width: 1024px) {
+
+  header {
+    padding: 24px 32px;
+  }
+
+  section {
+    padding: 80px 32px;
+  }
+
+  .hero {
+    padding: 0 32px;
+  }
+
+  .robots {
+    justify-content: center;
+  }
+}
+
+/* ===== Smartphone ===== */
+@media (max-width: 768px) {
+
+  /* Header */
+  header {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  nav a {
+    margin-left: 16px;
+    margin-right: 16px;
+    font-size: 0.9rem;
+  }
+
+  .logo {
+    height: 56px;
+  }
+
+  /* Hero */
+  .hero {
+    height: 80vh;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 2.6rem;
+  }
+
+  .hero::after {
+    font-size: 3rem;
+    right: -30px;
+  }
+
+  /* Sections */
+  section {
+    padding: 64px 24px;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  /* Robots */
+  .robots {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .robot-card {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  /* Sponsors */
+  .sponsor-list {
+    justify-content: center;
+  }
+
+  .sponsor-list img {
+    height: 120px;
+  }
+
+  /* Links */
+  .link-icons {
+    justify-content: center;
+    gap: 32px;
+  }
+
+  .link-icons img {
+    height: 56px;
+  }
+
+  /* Footer */
+  .footer-inner {
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .footer-right {
+    text-align: center;
+  }
+}
