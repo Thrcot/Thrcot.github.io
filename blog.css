@@ -1,0 +1,555 @@
+/* ============================================================
+   blog.css — Thrcot Robotics Blog
+   ============================================================ */
+
+/* ── BLOG HERO ── */
+.blog-hero {
+  background: var(--black);
+  color: var(--white);
+  padding: 140px 48px 80px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.blog-hero::before {
+  content: 'BLOG';
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.03);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+.blog-hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.blog-hero-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  margin: 0.4rem 0 0.8rem;
+}
+
+.blog-hero-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ── MAIN ── */
+.blog-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px 48px 100px;
+  min-height: 60vh;
+}
+
+/* ── TOOLBAR ── */
+.blog-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: var(--border);
+}
+
+.blog-filter {
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  padding: 8px 18px;
+  border: var(--border);
+  border-right: none;
+  background: var(--white);
+  color: var(--gray);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.filter-btn:last-child {
+  border-right: var(--border);
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: var(--black);
+  color: var(--white);
+}
+
+.blog-count {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  color: var(--gray);
+}
+
+/* ── BLOG GRID ── */
+.blog-grid {
+  display: grid;
+  /* 記事数に関わらず空の枠が出ないよう auto-fill → auto-fit に変更 */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0;
+  border-top: var(--border);
+  border-left: var(--border);
+}
+
+/* ── BLOG CARD ── */
+.blog-card {
+  background: var(--white);
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  flex-direction: column;
+  /* 各カードに右・下ボーダーを付けてグリッド線を表現 */
+  border-right: var(--border);
+  border-bottom: var(--border);
+}
+
+.blog-card:hover {
+  background: var(--light);
+}
+
+.blog-card-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--black);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.blog-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(20%);
+  transition: transform 0.4s, filter 0.3s;
+}
+
+.blog-card:hover .blog-card-thumb img {
+  transform: scale(1.04);
+  filter: grayscale(0%);
+}
+
+.blog-card-thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.2);
+}
+
+.blog-card-body {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.blog-card-cat {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--black);
+  padding: 2px 10px;
+}
+
+.blog-card-date {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--gray);
+}
+
+.blog-card-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.blog-card-arrow {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: var(--gray);
+  margin-top: 16px;
+  transition: color 0.2s;
+}
+
+.blog-card:hover .blog-card-arrow {
+  color: var(--black);
+}
+
+/* ── 記事なし ── */
+.blog-empty {
+  grid-column: 1 / -1;
+  padding: 80px 40px;
+  text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.15em;
+  color: var(--gray);
+  font-size: 0.85rem;
+}
+
+/* ── ARTICLE VIEW ── */
+.article-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.back-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: var(--border);
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin-bottom: 48px;
+  display: inline-block;
+}
+
+.back-btn:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+.article-meta {
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: var(--border);
+}
+
+.article-meta .art-cat {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--black);
+  padding: 2px 12px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.article-meta .art-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.2rem, 3vw, 1.9rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.article-meta .art-date {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  color: var(--gray);
+}
+
+/* ── MARKDOWN レンダリング ── */
+.article-body {
+  font-size: 0.97rem;
+  line-height: 2;
+  color: #222;
+}
+
+.article-body h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 10px;
+  border-bottom: var(--border);
+}
+
+.article-body h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin: 2rem 0 0.8rem;
+  border-left: 4px solid var(--black);
+  padding-left: 12px;
+  border-bottom: none;
+  margin-bottom: 0.8rem;
+}
+
+.article-body h3 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.article-body p {
+  margin-bottom: 1.2rem;
+}
+
+.article-body strong {
+  font-weight: 700;
+  background: rgba(0,0,0,0.05);
+  padding: 0 4px;
+}
+
+.article-body ul,
+.article-body ol {
+  padding-left: 1.5em;
+  margin-bottom: 1.2rem;
+}
+
+.article-body li {
+  margin-bottom: 0.4rem;
+}
+
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.88rem;
+}
+
+.article-body th {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.1em;
+  padding: 10px 16px;
+  text-align: left;
+}
+
+.article-body td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.article-body tr:hover td {
+  background: var(--light);
+}
+
+.article-body code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+  background: var(--light);
+  padding: 2px 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.article-body pre {
+  background: var(--black);
+  color: rgba(255,255,255,0.85);
+  padding: 24px;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.article-body pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.85rem;
+  color: inherit;
+}
+
+.article-body blockquote {
+  border-left: 4px solid var(--black);
+  padding: 8px 20px;
+  background: var(--light);
+  margin: 1.5rem 0;
+  color: var(--gray);
+}
+
+.article-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem 0;
+  border: var(--border);
+}
+
+/* ── 前後記事ナビ ── */
+.article-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: var(--border);
+  background: #e8e8e8;
+}
+
+.art-nav-item {
+  background: var(--white);
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.art-nav-item:hover { background: var(--light); }
+.art-nav-item.next { text-align: right; }
+
+.art-nav-dir {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--gray);
+  margin-bottom: 6px;
+}
+
+.art-nav-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+/* ── NAV ACTIVE ── */
+nav#globalNav a.nav-active {
+  color: var(--black);
+  background: var(--light);
+}
+
+/* ── LOADING ── */
+.blog-loading {
+  grid-column: 1 / -1;
+  padding: 80px;
+  text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.2em;
+  color: var(--gray);
+  font-size: 0.8rem;
+}
+
+/* ── ページネーション ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-top: 48px;
+  border: var(--border);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-right: var(--border);
+  background: var(--white);
+  color: var(--gray);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.page-btn:last-child {
+  border-right: none;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--light);
+  color: var(--black);
+}
+
+.page-btn.active {
+  background: var(--black);
+  color: var(--white);
+}
+
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.page-btn.page-arrow {
+  font-size: 0.8rem;
+  width: 48px;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .blog-main { padding: 48px 32px 80px; }
+  .blog-hero { padding: 130px 32px 64px; }
+}
+
+@media (max-width: 768px) {
+  .blog-hero { padding: 100px 20px 48px; }
+  .blog-main { padding: 40px 20px 64px; }
+
+  .blog-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .article-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .art-nav-item.next { text-align: left; }
+}
+
+@media (max-width: 480px) {
+  .blog-hero::before { font-size: 6rem; }
+  .filter-btn { font-size: 0.6rem; padding: 7px 12px; }
+}

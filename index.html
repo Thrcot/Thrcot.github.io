@@ -9,6 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;600&family=Inter:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MRB7Q4LSS1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MRB7Q4LSS1');
+</script>
 
 <body>
 
@@ -23,11 +32,8 @@
     </div>
   </a>
 
-  <!-- ハンバーガーボタン（スマホ用） -->
   <button class="nav-toggle" id="navToggle" aria-label="メニューを開く">
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span>
   </button>
 
   <nav id="globalNav">
@@ -35,6 +41,7 @@
     <a href="#robots">ROBOTS</a>
     <a href="#sponsors">SPONSORS</a>
     <a href="#links">LINKS</a>
+    <a href="blog.html">BLOG</a>
   </nav>
 </header>
 
@@ -52,7 +59,6 @@
       <span class="badge">AI CONTROL</span>
     </div>
   </div>
-
   <div class="hero-counter">
     <div class="counter-item">
       <div class="counter-num">4</div>
@@ -67,7 +73,6 @@
       <div class="counter-lbl">ROBOTS</div>
     </div>
   </div>
-
   <div class="hero-bg-text">ROBOCUP / JUNIOR / INFRARED / ROBOTICS</div>
 </section>
 
@@ -200,11 +205,7 @@
 <section id="sponsors">
   <div class="section-wrap fade">
     <h2><span class="h2-sub">03 — OUR SUPPORTERS</span>SPONSORS</h2>
-
     <div class="sponsor-tier">
-      <!--
-      <div class="tier-label">PLATINUM SPONSOR</div>
-      -->
       <div class="sponsor-row">
         <a class="sponsor-item" href="https://jlcpcb.com/" target="_blank" rel="noopener">
           <div class="sponsor-logo-box">
@@ -214,19 +215,10 @@
           </div>
         </a>
         <!--
-        <a class="sponsor-item" href="https://www.digikey.jp/" target="_blank" rel="noopener">
-          <div class="sponsor-logo-box">
-            <img src="images/Digikey.png" alt="JLCPCB"
-                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-            <span class="sponsor-name-fallback">Digikey</span>
-          </div>
-        </a>
-        -->
-        <!-- スポンサーを追加する場合はここにコピー -->
-        <!--
+        スポンサーを追加する場合はここにコピー
         <a class="sponsor-item" href="https://example.com/" target="_blank" rel="noopener">
           <div class="sponsor-logo-box">
-            <img src="images/sponsor2.png" alt="Sponsor Name"
+            <img src="images/sponsor.png" alt="Sponsor Name"
                  onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
             <span class="sponsor-name-fallback">SPONSOR NAME</span>
           </div>
@@ -234,7 +226,6 @@
         -->
       </div>
     </div>
-
     <div class="sponsor-cta">
       <p>スポンサーシップにご興味のある企業・個人様はお気軽にご連絡ください。</p>
       <a class="cta-btn" href="mailto:thrcot@gmail.com">BECOME A SPONSOR →</a>
