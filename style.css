@@ -1,192 +1,775 @@
-/* RESET */
-* {
+/* ============================================================
+   style.css — Thrcot Robotics
+   ============================================================ */
+
+/* ── RESET ── */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* BASE */
-body {
-  font-family: 'Inter', 'Noto Sans JP', sans-serif;
-  background: #fff;
-  color: #000;
-  line-height: 1.8;
+/* ── CSS変数 ── */
+:root {
+  --black: #000;
+  --white: #fff;
+  --gray: #888;
+  --light: #f4f4f4;
+  --border: 1px solid #000;
+  --border-white: 1px solid rgba(255, 255, 255, 0.15);
+
+  /* スポンサーロゴの統一サイズ */
+  --sponsor-logo-w: 160px;
+  --sponsor-logo-h: 80px;
 }
 
-/* HEADER */
+/* ── BASE ── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
 header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 32px 48px;
-  border-bottom: 1px solid #000;
-}
-
-.logo {
-  height: 72px;
-}
-
-nav a {
-  margin-left: 32px;
-  font-family: 'Orbitron', sans-serif;
-  text-decoration: none;
-  color: #000;
-  font-weight: 600;
-}
-
-nav a:hover {
-  border-bottom: 2px solid #000;
-}
-
-/* HERO */
-.hero {
-  position: relative;
-  background: #000;
-  color: #fff;
-  height: 90vh;
-  display: flex;
-  align-items: center;
   padding: 0 48px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: var(--border);
+  transition: box-shadow 0.3s;
 }
 
-.hero-inner {
-  position: relative;
+header.scrolled {
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
 }
 
-.hero h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(3.5rem, 8vw, 6rem);
-  letter-spacing: 0.08em;
-}
-
-.hero p {
-  margin-top: 20px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.2rem;
-  opacity: 0.8;
-}
-
-/* BACKGROUND TEXT */
-.hero::after {
-  content: "ROBOCUP / JUNIOR / INFRARED / ROBOTICS";
-  position: absolute;
-  bottom: 20px;
-  right: -50px;
-  font-family: 'Orbitron';
-  font-size: 6rem;
-  white-space: nowrap;
-  color: rgba(255,255,255,0.05);
-}
-
-/* SECTIONS */
-section {
-  padding: 100px 48px;
-  max-width: 1200px;
-  margin: auto;
-}
-
-.dark {
-  background: #000;
-  color: #fff;
-}
-
-h2 {
-  font-family: 'Orbitron', sans-serif;
-  margin-bottom: 40px;
-  letter-spacing: 0.1em;
-  border-left: 6px solid currentColor;
-  padding-left: 16px;
-}
-
-h3 {
-  font-family: 'Rajdhani', sans-serif;
-  margin-top: 16px;
-}
-
-/* ROBOTS */
-.robots {
-  display: flex;
-  gap: 32px;
-  flex-wrap: wrap;
-}
-
-.robot-card {
-  border: 1px solid currentColor;
-  padding: 24px;
-  width: 300px;
-}
-
-.robot-card img {
-  width: 100%;
-  filter: grayscale(100%);
-}
-
-/* SPONSORS */
-.sponsor-list {
-  display: flex;
-  gap: 48px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-top: 40px;
-}
-
-.sponsor-list img {
-  height: 150px;
-  max-width: 100%;
-  transition: 0.3s ease;
-}
-
-.sponsor-list a {
-  padding: 20px 30px;
-  background: #fff;
+/* ロゴ */
+.logo-area {
   display: flex;
   align-items: center;
-}
-
-/* hoverは控えめに */
-.sponsor-list a:hover img {
-  transform: scale(1.05);
-}
-
-/* LINKS */
-.links {
-  list-style: none;
-}
-
-.links li {
-  margin-bottom: 16px;
-}
-
-.links a {
-  font-family: 'Orbitron', sans-serif;
+  gap: 12px;
   text-decoration: none;
   color: inherit;
 }
 
-/* DIVIDER */
+.logo-img {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+}
+
+.logo-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--gray);
+}
+
+/* ── グローバルナビ（PC） ── */
+nav#globalNav {
+  display: flex;
+}
+
+nav#globalNav a {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--gray);
+  padding: 0 20px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  border-left: var(--border);
+  transition: color 0.2s, background 0.2s;
+}
+
+nav#globalNav a:last-child {
+  border-right: var(--border);
+}
+
+nav#globalNav a:hover {
+  color: var(--black);
+  background: var(--light);
+}
+
+/* ── ハンバーガーボタン（スマホ用） ── */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--black);
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+/* ハンバーガー → ✕ */
+.nav-toggle.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  position: relative;
+  color: var(--white);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 100px 48px 60px;
+  overflow: hidden;
+  background: var(--black);
+}
+
+/* 背景画像レイヤー（モノクロ処理） */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('images/hero.jpg');
+  background-size: cover;
+  background-position: center 40%;
+  /* CSSフィルターでモノクロ + 暗くして文字を読みやすく */
+  filter: grayscale(100%) brightness(0.32) contrast(1.1);
+}
+
+/* 画像の上にグラデーションオーバーレイ（左が濃く・右が薄め） */
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.38) 60%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-eyebrow {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.35em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 1.2rem;
+}
+
+.hero h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.8rem, 7.5vw, 6.5rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.0;
+  margin-bottom: 1.5rem;
+}
+
+.hero-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+  margin-bottom: 2.5rem;
+}
+
+.hero-badges {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* 右側カウンター */
+.hero-counter {
+  position: absolute;
+  right: 48px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  z-index: 2;
+}
+
+.counter-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: right;
+}
+
+.counter-lbl {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* 背景テキスト */
+.hero-bg-text {
+  position: absolute;
+  bottom: -10px;
+  right: -40px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.04);
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
 .divider {
-  height: 120px;
-  background: #000;
-  clip-path: polygon(0 20%, 100% 0%, 100% 80%, 0% 100%);
+  height: 72px;
+  background: var(--black);
+  clip-path: polygon(0 0, 100% 0, 100% 55%, 0 100%);
 }
 
 .divider.invert {
-  background: #fff;
+  background: var(--white);
+  clip-path: polygon(0 0, 100% 45%, 100% 100%, 0 100%);
 }
 
-/* FOOTER */
-footer {
+/* ============================================================
+   SECTION 共通
+   ============================================================ */
+.section-wrap {
+  padding: 100px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dark-section {
+  background: var(--black);
+  color: var(--white);
+}
+
+h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  margin-bottom: 48px;
+  border-left: 5px solid currentColor;
+  padding-left: 16px;
+  line-height: 1.3;
+}
+
+.h2-sub {
+  display: block;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  font-weight: 400;
+  opacity: 0.4;
+  margin-bottom: 4px;
+}
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+.about-text p {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+/* メンバーリスト */
+.about-members {
+  border: var(--border);
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: var(--border);
+  gap: 14px;
+}
+
+.member-row:last-child {
+  border-bottom: none;
+}
+
+.member-initial {
+  width: 40px;
+  height: 40px;
+  border: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.member-name-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}
+
+.member-role-text {
+  font-size: 0.75rem;
+  color: var(--gray);
+}
+
+/* ============================================================
+   ROBOTS
+   ============================================================ */
+.robots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.robot-card {
+  background: var(--black);
+  overflow: hidden;
+  transition: background 0.3s;
+}
+
+.robot-card:hover {
+  background: #0d0d0d;
+}
+
+/* ロボット画像エリア（縦横比固定） */
+.robot-img-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.robot-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);       /* 常にモノクロ */
+  transition: transform 0.4s;
+}
+
+.robot-card:hover .robot-img-wrap img {
+  filter: grayscale(100%);       /* hover でもモノクロ維持 */
+  transform: scale(1.04);
+}
+
+/* 画像がない場合のプレースホルダー */
+.robot-placeholder {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.15);
   text-align: center;
-  padding: 40px;
-  border-top: 1px solid #000;
-  font-family: 'Rajdhani';
+  gap: 8px;
 }
 
-/* ANIMATION */
+.placeholder-sub {
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+}
+
+.robot-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.65);
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.robot-info {
+  padding: 18px 22px;
+}
+
+.robot-year {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 5px;
+}
+
+.robot-event {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.38);
+  letter-spacing: 0.03em;
+}
+
+/* ============================================================
+   SPONSORS
+   ============================================================ */
+.sponsor-tier {
+  margin-bottom: 3rem;
+}
+
+.tier-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  font-weight: 600;
+  color: var(--gray);
+  margin-bottom: 1.2rem;
+}
+
+.sponsor-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+}
+
+/* ─────────────────────────────────────────────
+   スポンサーロゴ統一サイズ
+
+   どんなサイズの画像でも
+   - ボックス: 240×120px 固定
+   - 内部余白: 32px
+   - object-fit: contain でトリミングせず収める
+   - filter: grayscale でモノクロ統一 → hover でカラー
+   ───────────────────────────────────────────── */
+.sponsor-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: var(--border);
+  transition: background 0.2s;
+  /* カードサイズ固定 */
+  width: 240px;
+  height: 120px;
+  padding: 24px 32px;
+}
+
+.sponsor-item:hover {
+  background: var(--light);
+}
+
+/* ロゴを収めるコンテナ（固定サイズ） */
+.sponsor-logo-box {
+  width: var(--sponsor-logo-w);   /* 160px */
+  height: var(--sponsor-logo-h);  /* 80px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sponsor-logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  /* カラーそのまま表示 */
+  filter: none;
+  transition: transform 0.3s, opacity 0.3s;
+  opacity: 0.85;
+}
+
+.sponsor-item:hover .sponsor-logo-box img {
+  filter: none;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* 画像がない場合のテキストフォールバック */
+.sponsor-name-fallback {
+  display: none;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #aaa;
+  transition: color 0.2s;
+}
+
+.sponsor-item:hover .sponsor-name-fallback {
+  color: var(--black);
+}
+
+/* スポンサー募集CTA */
+.sponsor-cta {
+  margin-top: 2.5rem;
+  padding: 24px;
+  border: 1px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sponsor-cta p {
+  font-size: 0.85rem;
+  color: var(--gray);
+}
+
+.cta-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  padding: 12px 28px;
+  border: var(--border);
+  background: var(--black);
+  color: var(--white);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.cta-btn:hover {
+  background: var(--white);
+  color: var(--black);
+}
+
+/* ============================================================
+   LINKS
+   ============================================================ */
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1px;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 20px;
+  border: var(--border-white);
+  text-decoration: none;
+  color: var(--white);
+  transition: background 0.2s;
+}
+
+.link-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.link-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border: var(--border-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.link-icon-svg {
+  width: 22px;
+  height: 22px;
+  fill: rgba(255, 255, 255, 0.45);
+  transition: fill 0.2s;
+}
+
+.link-item:hover .link-icon-svg {
+  fill: rgba(255, 255, 255, 0.9);
+}
+
+.link-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  margin-bottom: 3px;
+}
+
+.link-url {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer {
+  position: relative;
+  background: var(--black);
+  color: var(--white);
+  overflow: hidden;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 48px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.footer-team {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.footer-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.32);
+  margin-top: 4px;
+}
+
+.footer-copy {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  opacity: 0.32;
+  text-align: right;
+  line-height: 1.7;
+}
+
+.footer-border {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-nav a {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.28);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-nav a:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.footer-school {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.08em;
+}
+
+.footer-bg-text {
+  position: absolute;
+  right: -60px;
+  bottom: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 5rem;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ============================================================
+   FADE アニメーション
+   ============================================================ */
 .fade {
   opacity: 0;
-  transform: translateY(40px);
-  transition: 0.8s ease;
+  transform: translateY(36px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
 }
 
 .fade.visible {
@@ -194,205 +777,233 @@ footer {
   transform: translateY(0);
 }
 
-/* LINK ICONS */
-.link-icons {
-  display: flex;
-  gap: 48px;
-  align-items: center;
-  margin-top: 40px;
-}
+.fade-delay-1 { transition-delay: 0.1s; }
+.fade-delay-2 { transition-delay: 0.2s; }
+.fade-delay-3 { transition-delay: 0.3s; }
 
-.link-icons img {
-  height: 64px;
-  filter: grayscale(100%) brightness(0.8);
-  transition: 0.3s ease;
-}
-
-.link-icons a:hover img {
-  filter: grayscale(0%) brightness(1);
-  transform: scale(1.1);
-}
-
-/* FOOTER */
-.site-footer {
-  background: #000;
-  color: #fff;
-  padding: 60px 48px;
-}
-
-.footer-inner {
-  max-width: 1200px;
-  margin: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.footer-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.footer-left img {
-  height: 48px;
-  filter: invert(1);
-}
-
-.footer-team {
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 0.08em;
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-
-.footer-right {
-  text-align: right;
-}
-
-.footer-copy {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.8rem;
-  opacity: 0.7;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-  .footer-inner {
-    flex-direction: column;
-    text-align: center;
-    gap: 24px;
-  }
-
-  .footer-right {
-    text-align: center;
-  }
-}
-
-.site-footer {
-  position: relative;
-  overflow: hidden;
-}
-
-.site-footer::after {
-  content: "ROBOCUP / JUNIOR / INFRARED / ROBOTICS";
-  position: absolute;
-  right: -60px;
-  bottom: 10px;
-  font-family: 'Orbitron';
-  font-size: 5rem;
-  white-space: nowrap;
-  color: rgba(255,255,255,0.04);
-  pointer-events: none;
-}
-
-/* =========================
-   RESPONSIVE DESIGN
-   ========================= */
-
-/* ===== Tablet ===== */
+/* ============================================================
+   RESPONSIVE — Tablet（〜1024px）
+   ============================================================ */
 @media (max-width: 1024px) {
-
   header {
-    padding: 24px 32px;
+    padding: 0 32px;
   }
 
-  section {
+  .section-wrap {
     padding: 80px 32px;
   }
 
   .hero {
-    padding: 0 32px;
+    padding: 100px 32px 60px;
   }
 
-  .robots {
-    justify-content: center;
+  .hero-counter {
+    right: 32px;
+    gap: 1.5rem;
   }
+
+  .counter-num {
+    font-size: 1.6rem;
+  }
+
+  .about-grid {
+    gap: 2.5rem;
+  }
+
+  .robots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* スポンサーカード：タブレットで少し小さく */
+  .sponsor-item {
+    width: 200px;
+    height: 100px;
+    padding: 20px 24px;
+  }
+
+  --sponsor-logo-w: 130px;
+  --sponsor-logo-h: 65px;
 }
 
-/* ===== Smartphone ===== */
+/* ============================================================
+   RESPONSIVE — Smartphone（〜768px）
+   ============================================================ */
 @media (max-width: 768px) {
-
-  /* Header */
+  /* ── ヘッダー ── */
   header {
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+    padding: 0 20px;
+    height: 60px;
   }
 
-  nav a {
-    margin-left: 16px;
-    margin-right: 16px;
+  .logo-text {
     font-size: 0.9rem;
   }
 
-  .logo {
-    height: 56px;
+  /* ハンバーガー表示 */
+  .nav-toggle {
+    display: flex;
+    z-index: 210;
   }
 
-  /* Hero */
+  /* ドロワーナビ */
+  nav#globalNav {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: var(--border);
+    flex-direction: column;
+    z-index: 200;
+  }
+
+  nav#globalNav.open {
+    display: flex;
+  }
+
+  nav#globalNav a {
+    height: 56px;
+    border-left: none;
+    border-right: none;
+    border-bottom: var(--border);
+    padding: 0 24px;
+    font-size: 0.8rem;
+  }
+
+  nav#globalNav a:last-child {
+    border-right: none;
+  }
+
+  /* ── ヒーロー ── */
   .hero {
-    height: 80vh;
-    text-align: center;
+    padding: 80px 24px 60px;
+    min-height: 100svh;
   }
 
   .hero h1 {
-    font-size: 2.6rem;
+    font-size: clamp(2.4rem, 12vw, 3.5rem);
   }
 
-  .hero::after {
-    font-size: 3rem;
-    right: -30px;
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
   }
 
-  /* Sections */
-  section {
-    padding: 64px 24px;
+  .hero-desc {
+    font-size: 0.9rem;
+  }
+
+  /* カウンターは非表示 */
+  .hero-counter {
+    display: none;
+  }
+
+  .hero-bg-text {
+    font-size: 2rem;
+    right: -20px;
+  }
+
+  /* ── セクション ── */
+  .section-wrap {
+    padding: 64px 20px;
   }
 
   h2 {
-    font-size: 1.4rem;
+    margin-bottom: 32px;
   }
 
-  /* Robots */
-  .robots {
+  /* ── About ── */
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* ── Robots ── */
+  .robots-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Sponsors ── */
+  .sponsor-row {
+    justify-content: center;
+  }
+
+  .sponsor-item {
+    width: 160px;
+    height: 90px;
+    padding: 16px 20px;
+  }
+
+  .sponsor-logo-box {
+    width: 120px;
+    height: 60px;
+  }
+
+  .sponsor-cta {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
 
-  .robot-card {
-    width: 100%;
-    max-width: 340px;
+  /* ── Links ── */
+  .links-grid {
+    grid-template-columns: 1fr;
   }
 
-  /* Sponsors */
-  .sponsor-list {
-    justify-content: center;
-  }
-
-  .sponsor-list img {
-    height: 120px;
-  }
-
-  /* Links */
-  .link-icons {
-    justify-content: center;
-    gap: 32px;
-  }
-
-  .link-icons img {
-    height: 56px;
-  }
-
-  /* Footer */
+  /* ── Footer ── */
   .footer-inner {
+    padding: 48px 20px 32px;
     flex-direction: column;
-    gap: 24px;
-    text-align: center;
+    align-items: flex-start;
+    gap: 16px;
   }
 
-  .footer-right {
-    text-align: center;
+  .footer-copy {
+    text-align: left;
+  }
+
+  .footer-border {
+    padding: 16px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Small Smartphone（〜480px）
+   ============================================================ */
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: clamp(2rem, 14vw, 2.8rem);
+  }
+
+  .hero-badges {
+    gap: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 5px 10px;
+  }
+
+  .sponsor-item {
+    width: 140px;
+    height: 80px;
+    padding: 12px 16px;
+  }
+
+  .sponsor-logo-box {
+    width: 100px;
+    height: 50px;
+  }
+
+  .divider {
+    height: 48px;
+  }
+
+  .divider.invert {
+    height: 48px;
   }
 }

@@ -3,21 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Thrcot Robotics</title>
-
-  <!-- Google Fonts -->
+  <title>Thrcot Robotics™</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;600&family=Inter:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
-  <img src="images/logo.png" alt="THRCOT Robotics Logo" class="logo">
-  <nav>
+<!-- ── HEADER ── -->
+<header id="header">
+  <a class="logo-area" href="#">
+    <img class="logo-img" src="images/logo.png" alt="Thrcot Robotics"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div style="display:none;">
+      <div class="logo-text">Thrcot</div>
+      <div class="logo-sub">Robotics™</div>
+    </div>
+  </a>
+
+  <!-- ハンバーガーボタン（スマホ用） -->
+  <button class="nav-toggle" id="navToggle" aria-label="メニューを開く">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <nav id="globalNav">
     <a href="#about">ABOUT</a>
     <a href="#robots">ROBOTS</a>
     <a href="#sponsors">SPONSORS</a>
@@ -25,91 +38,293 @@
   </nav>
 </header>
 
+<!-- ── HERO ── -->
 <section class="hero">
+  <div class="hero-bg"></div>
   <div class="hero-inner">
-    <h1>ENGINEERING<br>THE ROBOTICS.</h1>
-    <p>RoboCup Junior Infrared Team</p>
+    <p class="hero-eyebrow">ROBOCUP JUNIOR / INFRARED TEAM</p>
+    <h1>ENGINEERING<br>THE<br>FUTURE.</h1>
+    <p class="hero-desc">RoboCup Junior Infrared 2023 - 2026</p>
+    <div class="hero-badges">
+      <span class="badge">GIFU BLOCK</span>
+      <span class="badge">GUJO NODE</span>
+      <span class="badge">SELF-BUILT ROBOTS</span>
+      <span class="badge">AI CONTROL</span>
+    </div>
   </div>
+
+  <div class="hero-counter">
+    <div class="counter-item">
+      <div class="counter-num">4</div>
+      <div class="counter-lbl">MEMBERS</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num">4+</div>
+      <div class="counter-lbl">SEASONS</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num">2</div>
+      <div class="counter-lbl">ROBOTS</div>
+    </div>
+  </div>
+
+  <div class="hero-bg-text">ROBOCUP / JUNIOR / INFRARED / ROBOTICS</div>
 </section>
 
 <div class="divider"></div>
 
-<section id="about" class="fade">
-  <h2>ABOUT US</h2>
-  <p>
-    Thrcot は岐阜工業高等専門学校の学生4名によって構成された RoboCup Junior Infrared に挑戦するチームです。<br>
-    世界大会へ進出する。様々なチームと交流し供に技術の高みを目指すのが私たちの目標です。<br>
-    機械設計、回路設計、制御工学、AI、チームワークを融合し、全国大会優勝へと競技力を追求しています。
-  </p>
-</section>
-
-<section id="robots" class="dark fade">
-  <h2>OUR ROBOTS</h2>
-
-  <div class="robots">
-    <div class="robot-card">
-      <img src="images/2027.png" alt="2027">
-      <h3>2027</h3>
-      <p>Comming soon...</p>
-    </div>
-    <div class="robot-card">
-      <img src="images/2026.jpg" alt="2026">
-      <h3>2026</h3>
-      <p>RoboCup Junior Japan Open 2026 AICHI</p>
-    </div>
-    <div class="robot-card">
-      <img src="images/2025.jpg" alt="2025">
-      <h3>2025</h3>
-      <p>RoboCup Junior Gifu Block 2025</p>
-    </div>
-        <div class="robot-card">
-      <img src="images/2024.jpg" alt="2024">
-      <h3>2024</h3>
-      <p>RoboCup Junior Gifu Block 2024</p>
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="section-wrap fade">
+    <h2><span class="h2-sub">01 — WHO WE ARE</span>ABOUT US</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>Thrcot は岐阜工業高等専門学校の学生4名によって構成された、RoboCup Junior Infrared に挑戦するチームです。</p>
+        <p>世界大会への進出、そして様々なチームと交流しながら共に技術の高みを目指すことが私たちの目標です。</p>
+        <p>機械設計・回路設計・制御工学・AIをチームで分担し、全国大会優勝へ向けて競技力を日々追求しています。</p>
+      </div>
+      <div class="about-members fade fade-delay-1">
+        <div class="member-row">
+          <div class="member-initial">ZK</div>
+          <div class="member-info">
+            <div class="member-name-text">zukki</div>
+            <div class="member-role-text">回路設計 / LEADER</div>
+          </div>
+        </div>
+        <div class="member-row">
+          <div class="member-initial">TK</div>
+          <div class="member-info">
+            <div class="member-name-text">Takasou</div>
+            <div class="member-role-text">機械設計</div>
+          </div>
+        </div>
+        <div class="member-row">
+          <div class="member-initial">NO</div>
+          <div class="member-info">
+            <div class="member-name-text">neo</div>
+            <div class="member-role-text">制御 - ALGORITHM</div>
+          </div>
+        </div>
+        <div class="member-row">
+          <div class="member-initial">ZR</div>
+          <div class="member-info">
+            <div class="member-name-text">zari</div>
+            <div class="member-role-text">制御 - CAMERA & WIRELESS</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<div class="divider invert"></div>
+<!-- ── ROBOTS ── -->
+<div class="dark-section">
+  <div class="divider invert"></div>
+  <section id="robots">
+    <div class="section-wrap fade">
+      <h2><span class="h2-sub">02 — WHAT WE BUILD</span>OUR ROBOTS</h2>
+      <div class="robots-grid">
 
-<section id="sponsors" class="fade">
-  <h2>SPONSORS</h2>
-  <div class="sponsor-list">
-    <a href="https://jlcpcb.com/" target="_blank" rel="noopener">
-      <img src="images/jlcpcb.webp" alt="JLCPCB">
-    </a>
+        <div class="robot-card fade fade-delay-1">
+          <div class="robot-img-wrap">
+            <img src="images/2027.png" alt="2027"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="robot-placeholder">
+              <div>2027</div>
+              <div class="placeholder-sub">IMAGE COMING SOON</div>
+            </div>
+            <span class="robot-tag">UPCOMING</span>
+          </div>
+          <div class="robot-info">
+            <div class="robot-year">2027</div>
+            <div class="robot-event">Coming soon...</div>
+          </div>
+        </div>
+
+        <div class="robot-card fade fade-delay-2">
+          <div class="robot-img-wrap">
+            <img src="images/2026.jpg" alt="2026"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="robot-placeholder">
+              <div>2026</div>
+              <div class="placeholder-sub">ADD images/2026.jpg</div>
+            </div>
+            <span class="robot-tag">CURRENT</span>
+          </div>
+          <div class="robot-info">
+            <div class="robot-year">2026</div>
+            <div class="robot-event">RoboCup Junior Japan Open 2026 AICHI</div>
+          </div>
+        </div>
+
+        <div class="robot-card fade fade-delay-3">
+          <div class="robot-img-wrap">
+            <img src="images/2025.jpg" alt="2025"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="robot-placeholder">
+              <div>2025</div>
+              <div class="placeholder-sub">ADD images/2025.jpg</div>
+            </div>
+            <span class="robot-tag">2025</span>
+          </div>
+          <div class="robot-info">
+            <div class="robot-year">2025</div>
+            <div class="robot-event">RoboCup Junior Gifu Block 2025</div>
+          </div>
+        </div>
+
+        <div class="robot-card fade">
+          <div class="robot-img-wrap">
+            <img src="images/2024.jpg" alt="2024"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="robot-placeholder">
+              <div>2024</div>
+              <div class="placeholder-sub">ADD images/2024.jpg</div>
+            </div>
+            <span class="robot-tag">2024</span>
+          </div>
+          <div class="robot-info">
+            <div class="robot-year">2024</div>
+            <div class="robot-event">RoboCup Junior Gifu Block 2024</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="divider"></div>
+
+<!-- ── SPONSORS ── -->
+<section id="sponsors">
+  <div class="section-wrap fade">
+    <h2><span class="h2-sub">03 — OUR SUPPORTERS</span>SPONSORS</h2>
+
+    <div class="sponsor-tier">
+      <!--
+      <div class="tier-label">PLATINUM SPONSOR</div>
+      -->
+      <div class="sponsor-row">
+        <a class="sponsor-item" href="https://jlcpcb.com/" target="_blank" rel="noopener">
+          <div class="sponsor-logo-box">
+            <img src="images/jlcpcb.webp" alt="JLCPCB"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <span class="sponsor-name-fallback">JLCPCB</span>
+          </div>
+        </a>
+        <!--
+        <a class="sponsor-item" href="https://www.digikey.jp/" target="_blank" rel="noopener">
+          <div class="sponsor-logo-box">
+            <img src="images/Digikey.png" alt="JLCPCB"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <span class="sponsor-name-fallback">Digikey</span>
+          </div>
+        </a>
+        -->
+        <!-- スポンサーを追加する場合はここにコピー -->
+        <!--
+        <a class="sponsor-item" href="https://example.com/" target="_blank" rel="noopener">
+          <div class="sponsor-logo-box">
+            <img src="images/sponsor2.png" alt="Sponsor Name"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <span class="sponsor-name-fallback">SPONSOR NAME</span>
+          </div>
+        </a>
+        -->
+      </div>
+    </div>
+
+    <div class="sponsor-cta">
+      <p>スポンサーシップにご興味のある企業・個人様はお気軽にご連絡ください。</p>
+      <a class="cta-btn" href="thrcot@gmail.com">BECOME A SPONSOR →</a>
+    </div>
   </div>
 </section>
 
-<section id="links" class="dark fade">
-  <h2>LINKS</h2>
-  <div class="link-icons">
-    <a href="https://github.com/Thrcot" target="_blank">
-      <img src="images/github.png" alt="GitHub">
-    </a>
-    <a href="https://x.com/Thrcot_RCJ" target="_blank">
-      <img src="images/twitter.png" alt="X">
-    </a>
-  </div>
+<!-- ── LINKS ── -->
+<div class="dark-section">
+  <div class="divider invert"></div>
+  <section id="links">
+    <div class="section-wrap fade">
+      <h2><span class="h2-sub">04 — FIND US</span>LINKS</h2>
+      <div class="links-grid">
 
-</section>
+        <a class="link-item" href="https://github.com/Thrcot" target="_blank" rel="noopener">
+          <div class="link-icon-wrap">
+            <svg class="link-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.468-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="link-label">GITHUB</div>
+            <div class="link-url">github.com/Thrcot</div>
+          </div>
+        </a>
 
+        <a class="link-item" href="https://x.com/Thrcot_RCJ" target="_blank" rel="noopener">
+          <div class="link-icon-wrap">
+            <svg class="link-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="link-label">TWITTER</div>
+            <div class="link-url">@Thrcot_RCJ</div>
+          </div>
+        </a>
+
+        <a class="link-item" href="https://www.robocupjunior.jp" target="_blank" rel="noopener">
+          <div class="link-icon-wrap">
+            <svg class="link-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="link-label">ROBOCUP JUNIOR JP</div>
+            <div class="link-url">robocupjunior.jp</div>
+          </div>
+        </a>
+
+        <a class="link-item" href="https://junior.robocup.org/" target="_blank" rel="noopener">
+          <div class="link-icon-wrap">
+            <svg class="link-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="link-label">ROBOCUP JUNIOR</div>
+            <div class="link-url">junior.robocup.org</div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ── FOOTER ── -->
 <footer class="site-footer">
   <div class="footer-inner">
-    <div class="footer-left">
-      <p class="footer-team">
-        Thrcot Robotics<br>
-        創考機巧製作所
-      </p>
+    <div>
+      <div class="footer-team">THRCOT ROBOTICS™</div>
+      <div class="footer-sub">創考機巧製作所</div>
     </div>
-
-    <div class="footer-right">
-      <p class="footer-copy">
-        2026 Thrcot Robotics<br>
-        RoboCup Junior Infrared Team
-      </p>
+    <div class="footer-copy">
+      © 2026 Thrcot Robotics™<br>
+      RoboCup Junior Infrared Team<br>
+      2023 - 2026
     </div>
   </div>
+  <div class="footer-border">
+    <div class="footer-nav">
+      <a href="#about">ABOUT</a>
+      <a href="#robots">ROBOTS</a>
+      <a href="#sponsors">SPONSORS</a>
+      <a href="#links">LINKS</a>
+    </div>
+  </div>
+  <div class="footer-bg-text">ROBOCUP / JUNIOR / INFRARED / ROBOTICS</div>
 </footer>
 
 <script src="script.js"></script>
