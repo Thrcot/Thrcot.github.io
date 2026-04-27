@@ -821,8 +821,11 @@ h2 {
     padding: 20px 24px;
   }
 
-  --sponsor-logo-w: 130px;
-  --sponsor-logo-h: 65px;
+  /* CSS変数はメディアクエリ内では :root に入れないと効かない */
+  :root {
+    --sponsor-logo-w: 130px;
+    --sponsor-logo-h: 65px;
+  }
 }
 
 /* ============================================================
