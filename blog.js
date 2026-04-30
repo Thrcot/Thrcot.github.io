@@ -1,77 +1,160 @@
 /* ============================================================
-   blog.js — Thrcot Robotics Blog
-
-   【記事の追加方法】
+   【使用方法】
    1. posts/ フォルダに YYYY-MM-DD-タイトル.md を作成
-   2. posts/index.json に1行追加
+      フロントマターに author を追加:
+        ---
+        title: タイトル
+        date: 2026-05-10
+        category: 開発
+        author: zukki        ← zukki / Takasou / neo / zari
+        thumbnail: images/xxx.jpg
+        ---
+   2. posts/index.json に1行追加（author フィールドも任意で追加可）
    3. コミット＆プッシュするだけ！
-
-   【データ保存について】
-   いいね・閲覧数は localStorage に保存されます。
-   ユーザーごとのブラウザに保存されるため、
-   サーバーレス（GitHub Pages）でも動作します。
    ============================================================ */
 
 (function () {
   'use strict';
 
   const POSTS_PER_PAGE = 12;
-  const STORAGE_KEY    = 'thrcot_blog';    // localStorage キー
+
+  const SUPABASE_URL  = 'https://xtbjbnifcxurudzbgoxk.supabase.co';
+  const SUPABASE_ANON = 'sb_publishable_uL-wGAOMd5STLBLZgzXqvw_Q6cV1Pjh';
+
+  const useSupabase = !!(SUPABASE_URL && SUPABASE_ANON);
+
+  /* ── メンバー定義 ── */
+  const MEMBERS = {
+    zukki:   { name: 'zukki',   role: '回路設計 / LEADER',         initials: 'ZK' },
+    Takasou: { name: 'Takasou', role: '機械設計',                  initials: 'TK' },
+    neo:     { name: 'neo',     role: '制御 - ALGORITHM',          initials: 'NO' },
+    zari:    { name: 'zari',    role: '制御 - CAMERA & WIRELESS',  initials: 'ZR' },
+  };
 
   /* ── DOM 参照 ── */
-  const listView      = document.getElementById('listView');
-  const articleView   = document.getElementById('articleView');
-  const blogGrid      = document.getElementById('blogGrid');
-  const filterBar     = document.getElementById('filterBar');
-  const postCount     = document.getElementById('postCount');
-  const articleMeta   = document.getElementById('articleMeta');
-  const articleBody   = document.getElementById('articleBody');
-  const articleNav    = document.getElementById('articleNav');
-  const articleActions= document.getElementById('articleActions');
-  const backBtn       = document.getElementById('backBtn');
-  const sortKeyEl     = document.getElementById('sortKey');
-  const sortDirEl     = document.getElementById('sortDir');
+  const listView       = document.getElementById('listView');
+  const articleView    = document.getElementById('articleView');
+  const blogGrid       = document.getElementById('blogGrid');
+  const filterBar      = document.getElementById('filterBar');
+  const postCount      = document.getElementById('postCount');
+  const articleMeta    = document.getElementById('articleMeta');
+  const articleBody    = document.getElementById('articleBody');
+  const articleNav     = document.getElementById('articleNav');
+  const articleActions = document.getElementById('articleActions');
+  const backBtn        = document.getElementById('backBtn');
+  const sortKeyEl      = document.getElementById('sortKey');
+  const sortDirEl      = document.getElementById('sortDir');
 
   /* ── 状態 ── */
   let allPosts     = [];
   let currentCat   = 'all';
   let currentPage  = 1;
   let currentIndex = -1;
-  let sortKey      = 'date';   // 'date' | 'likes' | 'views'
-  let sortDir      = 'desc';   // 'asc'  | 'desc'
+  let sortKey      = 'date';
+  let sortDir      = 'desc';
+
+  /* ── Supabase カウントキャッシュ ── */
+  const statsCache = {};  // { [file]: { views, likes } }
 
   /* ============================================================
-     localStorage ヘルパー
-     キー構造: { [file]: { likes: N, liked: bool, views: N } }
+     Supabase ヘルパー
      ============================================================ */
-  function loadStorage() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-    catch { return {}; }
+  async function sbFetch(path, opts = {}) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      ...opts,
+      headers: {
+        'apikey':        SUPABASE_ANON,
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=representation',
+        ...(opts.headers || {}),
+      },
+    });
+    if (!res.ok) throw new Error(`Supabase ${res.status}`);
+    return res.json();
   }
 
-  function saveStorage(data) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-    catch {}
+  /* 全記事のカウントを一括取得してキャッシュ */
+  async function sbBatchLoad(files) {
+    if (!files.length) return;
+    try {
+      const filter = files.map(f => `"${f}"`).join(',');
+      const rows = await sbFetch(
+        `blog_stats?file=in.(${filter})&select=file,views,likes`
+      );
+      rows.forEach(r => { statsCache[r.file] = { views: r.views, likes: r.likes }; });
+    } catch (e) { console.warn('Supabase batch load failed:', e.message); }
   }
 
-  function getRecord(file) {
-    const s = loadStorage();
-    return s[file] || { likes: 0, liked: false, views: 0 };
+  /* upsert（INSERT or UPDATE） */
+  async function sbUpsert(file, views, likes) {
+    statsCache[file] = { views, likes };
+    try {
+      await sbFetch('blog_stats', {
+        method:  'POST',
+        headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+        body:    JSON.stringify({ file, views, likes }),
+      });
+    } catch (e) { console.warn('Supabase upsert failed:', e.message); }
   }
 
-  function setRecord(file, patch) {
-    const s = loadStorage();
-    s[file] = { ...getRecord(file), ...patch };
-    saveStorage(s);
+  /* ============================================================
+     localStorage フォールバック
+     ============================================================ */
+  const LS_KEY = 'thrcot_blog';
+
+  function lsLoad()    { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } }
+  function lsSave(d)   { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch {} }
+  function lsGet(file) { return lsLoad()[file] || { views: 0, likes: 0, liked: false }; }
+  function lsSet(file, patch) {
+    const s = lsLoad();
+    s[file] = { ...lsGet(file), ...patch };
+    lsSave(s);
   }
 
-  /* 閲覧数インクリメント（同セッション内で重複しないよう sessionStorage で管理） */
-  function incrementViews(file) {
+  /* ── いいね済みフラグは常に localStorage ── */
+  function isLiked(file)     { return lsGet(file).liked; }
+  function setLiked(file, v) { lsSet(file, { liked: v }); }
+
+  /* ── カウント取得（Supabase or localStorage） ── */
+  function getStats(file) {
+    if (useSupabase) return statsCache[file] || { views: 0, likes: 0 };
+    const r = lsGet(file);
+    return { views: r.views, likes: r.likes };
+  }
+
+  /* ── 閲覧数インクリメント ── */
+  async function incrementViews(file) {
     const sessionKey = 'thrcot_viewed_' + file;
-    if (sessionStorage.getItem(sessionKey)) return; // すでにカウント済み
+    if (sessionStorage.getItem(sessionKey)) return;  // 同セッション重複防止
     sessionStorage.setItem(sessionKey, '1');
-    const rec = getRecord(file);
-    setRecord(file, { views: rec.views + 1 });
+
+    if (useSupabase) {
+      const cur = statsCache[file] || { views: 0, likes: 0 };
+      const newViews = cur.views + 1;
+      await sbUpsert(file, newViews, cur.likes);
+    } else {
+      const r = lsGet(file);
+      lsSet(file, { views: r.views + 1 });
+    }
+  }
+
+  /* ── いいね切り替え ── */
+  async function toggleLike(file) {
+    const nowLiked = !isLiked(file);
+    setLiked(file, nowLiked);
+
+    if (useSupabase) {
+      const cur = statsCache[file] || { views: 0, likes: 0 };
+      const newLikes = Math.max(0, cur.likes + (nowLiked ? 1 : -1));
+      await sbUpsert(file, cur.views, newLikes);
+      return { liked: nowLiked, likes: newLikes };
+    } else {
+      const r = lsGet(file);
+      const newLikes = Math.max(0, r.likes + (nowLiked ? 1 : -1));
+      lsSet(file, { likes: newLikes });
+      return { liked: nowLiked, likes: newLikes };
+    }
   }
 
   /* ============================================================
@@ -89,19 +172,14 @@
   }
 
   /* ============================================================
-     日付フォーマット
+     ユーティリティ
      ============================================================ */
   function formatDate(str) {
     const d = new Date(str);
     if (isNaN(d)) return str;
-    return d.toLocaleDateString('ja-JP', {
-      year: 'numeric', month: 'long', day: 'numeric'
-    });
+    return d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
-  /* ============================================================
-     数値省略表示（1000 → 1K）
-     ============================================================ */
   function fmtNum(n) {
     if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
     return String(n);
@@ -111,24 +189,37 @@
      SVG アイコン
      ============================================================ */
   const ICONS = {
-    heart: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-               2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
-               C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
-               c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-    </svg>`,
-    eye: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5
-               s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z
-               M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z
-               M12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-    </svg>`,
-    x: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17
-               l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08
-               l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-    </svg>`
+    heart: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+    eye:   `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`,
+    /* 公式 X (Twitter) ロゴ */
+    xLogo: `<svg viewBox="0 0 1200 1227" xmlns="http://www.w3.org/2000/svg"><path d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284zM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854z"/></svg>`,
   };
+
+  /* ============================================================
+     著者バッジ HTML
+     ============================================================ */
+  function authorBadgeHtml(authorKey) {
+    const m = MEMBERS[authorKey];
+    if (!m) return '';
+    return `
+      <div class="author-badge">
+        <div class="author-initial">${m.initials}</div>
+        <div class="author-info">
+          <div class="author-name">${m.name}</div>
+          <div class="author-role">${m.role}</div>
+        </div>
+      </div>`;
+  }
+
+  /* カード用著者チップ */
+  function authorChipHtml(authorKey) {
+    const m = MEMBERS[authorKey];
+    if (!m) return '';
+    return `<div class="blog-card-author">
+      <span class="card-author-initial">${m.initials}</span>
+      <span class="card-author-name">${m.name}</span>
+    </div>`;
+  }
 
   /* ============================================================
      フィルターボタン生成
@@ -155,7 +246,7 @@
   }
 
   /* ============================================================
-     並べ替え
+     並べ替え（Supabase時はキャッシュ値、localStorage時はlsから）
      ============================================================ */
   function getSortedFiltered() {
     let posts = currentCat === 'all'
@@ -168,8 +259,8 @@
         va = new Date(a.date).getTime();
         vb = new Date(b.date).getTime();
       } else {
-        va = getRecord(a.file)[sortKey] || 0;
-        vb = getRecord(b.file)[sortKey] || 0;
+        va = getStats(a.file)[sortKey] || 0;
+        vb = getStats(b.file)[sortKey] || 0;
       }
       return sortDir === 'desc' ? vb - va : va - vb;
     });
@@ -200,7 +291,8 @@
 
     paged.forEach((post, i) => {
       const realIndex = allPosts.indexOf(post);
-      const rec = getRecord(post.file);
+      const st = getStats(post.file);
+      const authorKey = post.author || '';
 
       const card = document.createElement('div');
       card.className = 'blog-card fade';
@@ -218,19 +310,18 @@
             ${post.category ? `<span class="blog-card-cat">${post.category}</span>` : ''}
             <span class="blog-card-date">${formatDate(post.date)}</span>
           </div>
+          ${authorChipHtml(authorKey)}
           <div class="blog-card-title">${post.title}</div>
           <div class="blog-card-stats">
-            <span class="stat-chip">${ICONS.eye}${fmtNum(rec.views)}</span>
-            <span class="stat-chip">${ICONS.heart}${fmtNum(rec.likes)}</span>
+            <span class="stat-chip">${ICONS.eye}${fmtNum(st.views)}</span>
+            <span class="stat-chip">${ICONS.heart}${fmtNum(st.likes)}</span>
           </div>
           <div class="blog-card-arrow">READ MORE →</div>
         </div>`;
       card.addEventListener('click', () => openArticle(realIndex));
       blogGrid.appendChild(card);
 
-      requestAnimationFrame(() => {
-        setTimeout(() => card.classList.add('visible'), i * 60);
-      });
+      requestAnimationFrame(() => setTimeout(() => card.classList.add('visible'), i * 60));
     });
 
     renderPagination(totalPages, currentPage);
@@ -248,16 +339,14 @@
     nav.className = 'pagination';
     nav.id = 'pagination';
 
-    const prevBtn = makePageBtn('←', page <= 1, () => { currentPage--; renderList(); });
-    prevBtn.classList.add('page-arrow');
-    nav.appendChild(prevBtn);
+    const prev = makePageBtn('←', page <= 1, () => { currentPage--; renderList(); });
+    prev.classList.add('page-arrow');
+    nav.appendChild(prev);
 
     buildPageNumbers(page, totalPages).forEach(p => {
       if (p === '...') {
         const el = document.createElement('div');
-        el.className = 'page-btn';
-        el.textContent = '…';
-        el.style.cursor = 'default';
+        el.className = 'page-btn'; el.textContent = '…'; el.style.cursor = 'default';
         nav.appendChild(el);
       } else {
         const btn = makePageBtn(p, false, () => { currentPage = p; renderList(); });
@@ -266,18 +355,15 @@
       }
     });
 
-    const nextBtn = makePageBtn('→', page >= totalPages, () => { currentPage++; renderList(); });
-    nextBtn.classList.add('page-arrow');
-    nav.appendChild(nextBtn);
-
+    const next = makePageBtn('→', page >= totalPages, () => { currentPage++; renderList(); });
+    next.classList.add('page-arrow');
+    nav.appendChild(next);
     blogGrid.parentNode.insertBefore(nav, blogGrid.nextSibling);
   }
 
   function makePageBtn(label, disabled, onClick) {
     const btn = document.createElement('button');
-    btn.className = 'page-btn';
-    btn.textContent = label;
-    btn.disabled = disabled;
+    btn.className = 'page-btn'; btn.textContent = label; btn.disabled = disabled;
     if (!disabled) btn.addEventListener('click', onClick);
     return btn;
   }
@@ -286,8 +372,7 @@
     if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
     const pages = [];
     if (current <= 4) {
-      for (let i = 1; i <= 5; i++) pages.push(i);
-      pages.push('...'); pages.push(total);
+      for (let i = 1; i <= 5; i++) pages.push(i); pages.push('...'); pages.push(total);
     } else if (current >= total - 3) {
       pages.push(1); pages.push('...');
       for (let i = total - 4; i <= total; i++) pages.push(i);
@@ -310,13 +395,12 @@
     articleView.style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    articleBody.innerHTML   = '<p style="color:#888;font-family:Rajdhani,sans-serif;letter-spacing:.15em;">LOADING...</p>';
-    articleMeta.innerHTML   = '';
-    articleNav.innerHTML    = '';
-    articleActions.innerHTML= '';
+    articleBody.innerHTML    = '<p style="color:#888;font-family:Rajdhani,sans-serif;letter-spacing:.15em;">LOADING...</p>';
+    articleMeta.innerHTML    = '';
+    articleNav.innerHTML     = '';
+    articleActions.innerHTML = '';
 
-    // 閲覧数カウント
-    incrementViews(post.file);
+    await incrementViews(post.file);
 
     try {
       const res = await fetch(`posts/${post.file}`);
@@ -324,14 +408,19 @@
       const raw = await res.text();
       const { meta, body } = parseFrontmatter(raw);
 
+      // authorはMDフロントマター優先、なければindex.jsonの値を使用
+      const authorKey = meta.author || post.author || '';
+
       articleMeta.innerHTML = `
         ${meta.category ? `<div class="art-cat">${meta.category}</div>` : ''}
         <div class="art-title">${meta.title || post.title}</div>
-        <div class="art-date">${formatDate(meta.date || post.date)}</div>`;
+        <div class="art-meta-row">
+          <span class="art-date">${formatDate(meta.date || post.date)}</span>
+          ${authorKey ? `<span class="art-meta-sep">／</span>${authorBadgeHtml(authorKey)}` : ''}
+        </div>`;
 
       articleBody.innerHTML = marked.parse(body);
-
-      renderArticleActions(post, meta);
+      renderArticleActions(post, meta, authorKey);
       renderArticleNav(index);
 
     } catch (e) {
@@ -340,56 +429,53 @@
   }
 
   /* ============================================================
-     記事アクションバー（いいね・閲覧数・Twitterシェア）
+     記事アクションバー（閲覧数・いいね・Xシェア）
      ============================================================ */
-  function renderArticleActions(post, meta) {
-    const rec   = getRecord(post.file);
-    const title = meta.title || post.title;
+  function renderArticleActions(post, meta, authorKey) {
+    const st    = getStats(post.file);
+    const liked = isLiked(post.file);
+    const title = encodeURIComponent(`${meta.title || post.title} - THRCOT ROBOTICS™ @Thrcot_RCJ`);
     const url   = encodeURIComponent(location.href);
-    const text  = encodeURIComponent(`${title} - THRCOT ROBOTICS™ @Thrcot_RCJ\n`);
-    const tweetUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${title}%0a&url=${url}`;
 
     articleActions.innerHTML = `
-      <span class="action-stat">${ICONS.eye}<span id="viewCount">${fmtNum(rec.views)}</span> VIEWS</span>
+      <span class="action-stat">${ICONS.eye}<span id="viewCount">${fmtNum(st.views)}</span> VIEWS</span>
       <div class="action-sep"></div>
-      <span class="action-stat">${ICONS.heart}<span id="likeCount">${fmtNum(rec.likes)}</span> LIKES</span>
+      <span class="action-stat">${ICONS.heart}<span id="likeCount">${fmtNum(st.likes)}</span> LIKES</span>
       <div class="action-spacer"></div>
-      <button class="like-btn${rec.liked ? ' liked' : ''}" id="likeBtn">
+      <button class="like-btn${liked ? ' liked' : ''}" id="likeBtn" aria-label="いいね">
         <svg class="like-heart" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                   2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
-                   C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
-                   c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
-        ${rec.liked ? 'LIKED' : 'LIKE'}
+        <span class="like-label">${liked ? 'LIKED' : 'LIKE'}</span>
       </button>
-      <a class="share-btn" href="${tweetUrl}" target="_blank" rel="noopener">
-        ${ICONS.x.replace('<svg', '<svg class="share-icon"')}SHARE
+      <a class="share-btn" href="${tweetUrl}" target="_blank" rel="noopener" aria-label="Xでシェア">
+        <svg class="share-x-icon" viewBox="0 0 1200 1227" xmlns="http://www.w3.org/2000/svg">
+          <path d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284zM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854z"/>
+        </svg>
+        SHARE
       </a>`;
 
-    // いいねボタンのイベント
     const likeBtn   = document.getElementById('likeBtn');
     const likeCount = document.getElementById('likeCount');
-
-    likeBtn.addEventListener('click', () => {
-      const r = getRecord(post.file);
-      const nowLiked = !r.liked;
-      const newCount = r.likes + (nowLiked ? 1 : -1);
-      setRecord(post.file, { liked: nowLiked, likes: Math.max(0, newCount) });
-
-      likeBtn.classList.toggle('liked', nowLiked);
-      likeBtn.classList.remove('pop');
-      void likeBtn.offsetWidth; // reflow でアニメーションリセット
-      likeBtn.classList.add('pop');
-
-      // ラベル更新（SVGは維持）
-      likeBtn.childNodes[likeBtn.childNodes.length - 1].textContent = nowLiked ? 'LIKED' : 'LIKE';
-      likeCount.textContent = fmtNum(Math.max(0, newCount));
-    });
-
-    // 閲覧数を再取得して表示更新
     const viewCount = document.getElementById('viewCount');
-    viewCount.textContent = fmtNum(getRecord(post.file).views);
+
+    viewCount.textContent = fmtNum(getStats(post.file).views);
+
+    likeBtn.addEventListener('click', async () => {
+      likeBtn.disabled = true;
+      try {
+        const result = await toggleLike(post.file);
+        likeBtn.classList.toggle('liked', result.liked);
+        likeBtn.classList.remove('pop');
+        void likeBtn.offsetWidth;
+        likeBtn.classList.add('pop');
+        likeBtn.querySelector('.like-label').textContent = result.liked ? 'LIKED' : 'LIKE';
+        likeCount.textContent = fmtNum(result.likes);
+      } finally {
+        likeBtn.disabled = false;
+      }
+    });
   }
 
   /* ============================================================
@@ -400,13 +486,11 @@
     const next = index - 1 >= 0             ? allPosts[index - 1] : null;
 
     articleNav.innerHTML = `
-      <div class="art-nav-item prev"
-           style="${prev ? '' : 'opacity:.3;pointer-events:none;'}">
+      <div class="art-nav-item prev" style="${prev ? '' : 'opacity:.3;pointer-events:none;'}">
         <div class="art-nav-dir">← PREV</div>
         <div class="art-nav-title">${prev ? prev.title : ''}</div>
       </div>
-      <div class="art-nav-item next"
-           style="${next ? '' : 'opacity:.3;pointer-events:none;'}">
+      <div class="art-nav-item next" style="${next ? '' : 'opacity:.3;pointer-events:none;'}">
         <div class="art-nav-dir">NEXT →</div>
         <div class="art-nav-title">${next ? next.title : ''}</div>
       </div>`;
@@ -421,19 +505,14 @@
   backBtn.addEventListener('click', () => {
     articleView.style.display = 'none';
     listView.style.display    = 'block';
-    renderList(); // カードのいいね・閲覧数を再描画
+    renderList();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   /* ============================================================
      並べ替えコントロール
      ============================================================ */
-  sortKeyEl.addEventListener('change', () => {
-    sortKey     = sortKeyEl.value;
-    currentPage = 1;
-    renderList();
-  });
-
+  sortKeyEl.addEventListener('change', () => { sortKey = sortKeyEl.value; currentPage = 1; renderList(); });
   sortDirEl.addEventListener('click', () => {
     sortDir = sortDir === 'desc' ? 'asc' : 'desc';
     sortDirEl.dataset.dir = sortDir;
@@ -448,13 +527,18 @@
      ============================================================ */
   async function init() {
     blogGrid.innerHTML = '<div class="blog-loading">LOADING POSTS...</div>';
-
     try {
       const res = await fetch('posts/index.json');
       if (!res.ok) throw new Error(`posts/index.json を読み込めません (HTTP ${res.status})`);
       allPosts = await res.json();
 
       buildFilters(allPosts);
+
+      // Supabase から全記事カウントを一括取得
+      if (useSupabase) {
+        await sbBatchLoad(allPosts.map(p => p.file));
+      }
+
       renderList();
 
       const hash  = location.hash;
