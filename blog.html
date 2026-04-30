@@ -12,9 +12,19 @@
 </head>
 <body>
 
-<!-- ── HEADER（共通） ── -->
+<!-- ── HEADER ── -->
 <header id="header">
-  <a class="logo-area" href="index.html">
+
+  <!-- Twitterカードの種類（大きな画像を表示する場合） -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <!-- 表示したいタイトル -->
+  <meta name="twitter:title" content="Thrcot Robotics™" />
+  <!-- 表示したい説明文 -->
+  <meta name="twitter:description" content="Thrcot Robotics™" />
+  <!-- 表示したい画像のURL（絶対パスで指定） -->
+  <meta name="twitter:image" content="images/hero.jpg" />
+
+  <a class="logo-area" href="#">
     <img class="logo-img" src="images/logo.png" alt="Thrcot Robotics"
          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
     <div style="display:none;">
@@ -22,24 +32,27 @@
       <div class="logo-sub">Robotics™</div>
     </div>
   </a>
+
   <button class="nav-toggle" id="navToggle" aria-label="メニューを開く">
     <span></span><span></span><span></span>
   </button>
+
   <nav id="globalNav">
-    <a href="index.html#about">ABOUT</a>
-    <a href="index.html#robots">ROBOTS</a>
-    <a href="index.html#sponsors">SPONSORS</a>
-    <a href="index.html#links">LINKS</a>
-    <a href="blog.html" class="nav-active">BLOG</a>
+    <a href="#about">ABOUT</a>
+    <a href="#robots">ROBOTS</a>
+    <a href="#sponsors">SPONSORS</a>
+    <a href="#links">LINKS</a>
+    <a href="blog.html">BLOG</a>
   </nav>
 </header>
+
 
 <!-- ── BLOG HERO ── -->
 <div class="blog-hero">
   <div class="blog-hero-inner">
     <p class="hero-eyebrow">THRCOT ROBOTICS™</p>
     <h1 class="blog-hero-title">BLOG</h1>
-    <p class="blog-hero-sub">活動記録・開発日誌・大会レポート</p>
+    <p class="blog-hero-sub">活動記録・開発日誌・技術資料</p>
   </div>
 </div>
 
@@ -49,11 +62,23 @@
   <!-- 一覧ビュー -->
   <div id="listView">
     <div class="blog-toolbar">
+      <!-- カテゴリフィルター -->
       <div class="blog-filter" id="filterBar">
         <button class="filter-btn active" data-cat="all">ALL</button>
         <!-- カテゴリは動的に追加 -->
       </div>
-      <div class="blog-count" id="postCount"></div>
+      <!-- 右側：件数 + 並べ替え -->
+      <div class="blog-toolbar-right">
+        <div class="blog-count" id="postCount"></div>
+        <div class="sort-controls">
+          <select class="sort-select" id="sortKey">
+            <option value="date">日付</option>
+            <option value="likes">いいね数</option>
+            <option value="views">閲覧数</option>
+          </select>
+          <button class="sort-dir-btn" id="sortDir" data-dir="desc" title="降順">↓</button>
+        </div>
+      </div>
     </div>
     <div class="blog-grid" id="blogGrid">
       <!-- 記事カードは JS で生成 -->
@@ -66,6 +91,8 @@
       <button class="back-btn" id="backBtn">← BLOG に戻る</button>
       <div class="article-meta" id="articleMeta"></div>
       <div class="article-body" id="articleBody"></div>
+      <!-- いいね・シェア・閲覧数バー -->
+      <div class="article-actions" id="articleActions"></div>
       <div class="article-nav" id="articleNav"></div>
     </div>
   </div>

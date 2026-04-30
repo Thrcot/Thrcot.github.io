@@ -104,6 +104,201 @@
   color: var(--gray);
 }
 
+/* ── ツールバー右側（件数＋並べ替え） ── */
+.blog-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ── 並べ替えコントロール ── */
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.sort-select {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  padding: 0 10px;
+  height: 34px;
+  border: var(--border);
+  border-right: none;
+  background: var(--white);
+  color: var(--gray);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.sort-select:focus { outline: none; border-color: var(--black); color: var(--black); }
+
+.sort-dir-btn {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  width: 34px;
+  height: 34px;
+  border: var(--border);
+  background: var(--white);
+  color: var(--gray);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.sort-dir-btn:hover { background: var(--black); color: var(--white); }
+.sort-dir-btn.asc { transform: scaleY(-1); }
+
+/* ── カード統計（閲覧数・いいね数） ── */
+.blog-card-stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.stat-chip {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--gray);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-chip svg {
+  width: 12px;
+  height: 12px;
+  fill: var(--gray);
+  flex-shrink: 0;
+}
+
+/* ── 記事アクションバー ── */
+.article-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 48px;
+  padding: 24px;
+  border: var(--border);
+  flex-wrap: wrap;
+}
+
+.action-stat {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: var(--gray);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-stat svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--gray);
+}
+
+.action-sep {
+  width: 1px;
+  height: 20px;
+  background: #ddd;
+}
+
+.action-spacer { flex: 1; }
+
+/* いいねボタン */
+.like-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  height: 38px;
+  box-sizing: border-box;
+  padding: 0 20px;
+  border: var(--border);
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.like-btn:hover { background: var(--light); transform: translateY(-1px); }
+
+.like-btn.liked {
+  background: var(--black);
+  color: var(--white);
+}
+
+.like-btn.liked .like-heart { fill: #ff4466; }
+
+.like-btn.pop {
+  animation: likePop 0.35s ease;
+}
+
+@keyframes likePop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.2); }
+  70%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+.like-heart {
+  width: 14px;
+  height: 14px;
+  fill: var(--gray);
+  transition: fill 0.2s;
+  flex-shrink: 0;
+}
+
+/* Twitterシェアボタン */
+.share-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  height: 38px;
+  box-sizing: border-box;
+  padding: 0 20px;
+  border: var(--border);
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.share-btn:hover { background: var(--black); color: var(--white); }
+.share-btn:hover .share-icon { fill: var(--white); }
+
+.share-icon {
+  width: 13px;
+  height: 13px;
+  fill: var(--black);
+  flex-shrink: 0;
+  transition: fill 0.2s;
+}
+
 /* ── BLOG GRID ── */
 .blog-grid {
   display: grid;
@@ -538,6 +733,11 @@ nav#globalNav a.nav-active {
     align-items: flex-start;
   }
 
+  .blog-toolbar-right {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
   .blog-grid {
     grid-template-columns: 1fr;
   }
@@ -547,6 +747,8 @@ nav#globalNav a.nav-active {
   }
 
   .art-nav-item.next { text-align: left; }
+
+  .article-actions { gap: 8px; }
 }
 
 @media (max-width: 480px) {

@@ -5,29 +5,74 @@
    1. posts/ フォルダに YYYY-MM-DD-タイトル.md を作成
    2. posts/index.json に1行追加
    3. コミット＆プッシュするだけ！
+
+   【データ保存について】
+   いいね・閲覧数は localStorage に保存されます。
+   ユーザーごとのブラウザに保存されるため、
+   サーバーレス（GitHub Pages）でも動作します。
    ============================================================ */
 
 (function () {
   'use strict';
 
-  const POSTS_PER_PAGE = 12; // 1ページあたりの記事数
+  const POSTS_PER_PAGE = 12;
+  const STORAGE_KEY    = 'thrcot_blog';    // localStorage キー
 
   /* ── DOM 参照 ── */
-  const listView    = document.getElementById('listView');
-  const articleView = document.getElementById('articleView');
-  const blogGrid    = document.getElementById('blogGrid');
-  const filterBar   = document.getElementById('filterBar');
-  const postCount   = document.getElementById('postCount');
-  const articleMeta = document.getElementById('articleMeta');
-  const articleBody = document.getElementById('articleBody');
-  const articleNav  = document.getElementById('articleNav');
-  const backBtn     = document.getElementById('backBtn');
+  const listView      = document.getElementById('listView');
+  const articleView   = document.getElementById('articleView');
+  const blogGrid      = document.getElementById('blogGrid');
+  const filterBar     = document.getElementById('filterBar');
+  const postCount     = document.getElementById('postCount');
+  const articleMeta   = document.getElementById('articleMeta');
+  const articleBody   = document.getElementById('articleBody');
+  const articleNav    = document.getElementById('articleNav');
+  const articleActions= document.getElementById('articleActions');
+  const backBtn       = document.getElementById('backBtn');
+  const sortKeyEl     = document.getElementById('sortKey');
+  const sortDirEl     = document.getElementById('sortDir');
 
   /* ── 状態 ── */
   let allPosts     = [];
   let currentCat   = 'all';
   let currentPage  = 1;
   let currentIndex = -1;
+  let sortKey      = 'date';   // 'date' | 'likes' | 'views'
+  let sortDir      = 'desc';   // 'asc'  | 'desc'
+
+  /* ============================================================
+     localStorage ヘルパー
+     キー構造: { [file]: { likes: N, liked: bool, views: N } }
+     ============================================================ */
+  function loadStorage() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    catch { return {}; }
+  }
+
+  function saveStorage(data) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+    catch {}
+  }
+
+  function getRecord(file) {
+    const s = loadStorage();
+    return s[file] || { likes: 0, liked: false, views: 0 };
+  }
+
+  function setRecord(file, patch) {
+    const s = loadStorage();
+    s[file] = { ...getRecord(file), ...patch };
+    saveStorage(s);
+  }
+
+  /* 閲覧数インクリメント（同セッション内で重複しないよう sessionStorage で管理） */
+  function incrementViews(file) {
+    const sessionKey = 'thrcot_viewed_' + file;
+    if (sessionStorage.getItem(sessionKey)) return; // すでにカウント済み
+    sessionStorage.setItem(sessionKey, '1');
+    const rec = getRecord(file);
+    setRecord(file, { views: rec.views + 1 });
+  }
 
   /* ============================================================
      フロントマター解析
@@ -55,6 +100,37 @@
   }
 
   /* ============================================================
+     数値省略表示（1000 → 1K）
+     ============================================================ */
+  function fmtNum(n) {
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return String(n);
+  }
+
+  /* ============================================================
+     SVG アイコン
+     ============================================================ */
+  const ICONS = {
+    heart: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+               2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+               C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
+               c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>`,
+    eye: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5
+               s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z
+               M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z
+               M12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+    </svg>`,
+    x: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17
+               l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08
+               l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>`
+  };
+
+  /* ============================================================
      フィルターボタン生成
      ============================================================ */
   function buildFilters(posts) {
@@ -79,31 +155,41 @@
   }
 
   /* ============================================================
-     フィルター済み記事取得
+     並べ替え
      ============================================================ */
-  function getFiltered() {
-    return currentCat === 'all'
-      ? allPosts
+  function getSortedFiltered() {
+    let posts = currentCat === 'all'
+      ? [...allPosts]
       : allPosts.filter(p => p.category === currentCat);
+
+    posts.sort((a, b) => {
+      let va, vb;
+      if (sortKey === 'date') {
+        va = new Date(a.date).getTime();
+        vb = new Date(b.date).getTime();
+      } else {
+        va = getRecord(a.file)[sortKey] || 0;
+        vb = getRecord(b.file)[sortKey] || 0;
+      }
+      return sortDir === 'desc' ? vb - va : va - vb;
+    });
+    return posts;
   }
 
   /* ============================================================
-     記事一覧レンダリング（ページネーション付き）
+     記事一覧レンダリング
      ============================================================ */
   function renderList() {
-    const filtered   = getFiltered();
+    const filtered   = getSortedFiltered();
     const totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE);
 
-    // ページ範囲補正
     if (currentPage < 1) currentPage = 1;
     if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
 
-    const start  = (currentPage - 1) * POSTS_PER_PAGE;
-    const paged  = filtered.slice(start, start + POSTS_PER_PAGE);
+    const start = (currentPage - 1) * POSTS_PER_PAGE;
+    const paged = filtered.slice(start, start + POSTS_PER_PAGE);
 
     postCount.textContent = `${filtered.length} POST${filtered.length !== 1 ? 'S' : ''}`;
-
-    // グリッドをクリアして再描画
     blogGrid.innerHTML = '';
 
     if (filtered.length === 0) {
@@ -114,6 +200,8 @@
 
     paged.forEach((post, i) => {
       const realIndex = allPosts.indexOf(post);
+      const rec = getRecord(post.file);
+
       const card = document.createElement('div');
       card.className = 'blog-card fade';
       card.innerHTML = `
@@ -131,72 +219,57 @@
             <span class="blog-card-date">${formatDate(post.date)}</span>
           </div>
           <div class="blog-card-title">${post.title}</div>
+          <div class="blog-card-stats">
+            <span class="stat-chip">${ICONS.eye}${fmtNum(rec.views)}</span>
+            <span class="stat-chip">${ICONS.heart}${fmtNum(rec.likes)}</span>
+          </div>
           <div class="blog-card-arrow">READ MORE →</div>
         </div>`;
       card.addEventListener('click', () => openArticle(realIndex));
       blogGrid.appendChild(card);
 
-      // フェードイン
       requestAnimationFrame(() => {
         setTimeout(() => card.classList.add('visible'), i * 60);
       });
     });
 
     renderPagination(totalPages, currentPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /* ============================================================
-     ページネーション描画
+     ページネーション
      ============================================================ */
   function renderPagination(totalPages, page) {
-    // 既存のページネーションを削除
     const old = document.getElementById('pagination');
     if (old) old.remove();
-
-    if (totalPages <= 1) return; // 1ページ以下は表示しない
+    if (totalPages <= 1) return;
 
     const nav = document.createElement('div');
     nav.className = 'pagination';
     nav.id = 'pagination';
 
-    // ← 前へ
-    const prevBtn = makePageBtn('←', page <= 1, () => {
-      currentPage--;
-      renderList();
-    });
+    const prevBtn = makePageBtn('←', page <= 1, () => { currentPage--; renderList(); });
     prevBtn.classList.add('page-arrow');
     nav.appendChild(prevBtn);
 
-    // ページ番号ボタン
-    // 多い場合は省略記号を使う（最大7ボタン）
-    const pages = buildPageNumbers(page, totalPages);
-    pages.forEach(p => {
+    buildPageNumbers(page, totalPages).forEach(p => {
       if (p === '...') {
-        const ellipsis = document.createElement('div');
-        ellipsis.className = 'page-btn';
-        ellipsis.textContent = '…';
-        ellipsis.style.cursor = 'default';
-        nav.appendChild(ellipsis);
+        const el = document.createElement('div');
+        el.className = 'page-btn';
+        el.textContent = '…';
+        el.style.cursor = 'default';
+        nav.appendChild(el);
       } else {
-        const btn = makePageBtn(p, false, () => {
-          currentPage = p;
-          renderList();
-        });
+        const btn = makePageBtn(p, false, () => { currentPage = p; renderList(); });
         if (p === page) btn.classList.add('active');
         nav.appendChild(btn);
       }
     });
 
-    // → 次へ
-    const nextBtn = makePageBtn('→', page >= totalPages, () => {
-      currentPage++;
-      renderList();
-    });
+    const nextBtn = makePageBtn('→', page >= totalPages, () => { currentPage++; renderList(); });
     nextBtn.classList.add('page-arrow');
     nav.appendChild(nextBtn);
 
-    // グリッドの後に挿入
     blogGrid.parentNode.insertBefore(nav, blogGrid.nextSibling);
   }
 
@@ -209,26 +282,19 @@
     return btn;
   }
 
-  // 表示するページ番号の配列を生成（省略あり）
   function buildPageNumbers(current, total) {
-    if (total <= 7) {
-      return Array.from({ length: total }, (_, i) => i + 1);
-    }
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
     const pages = [];
     if (current <= 4) {
       for (let i = 1; i <= 5; i++) pages.push(i);
-      pages.push('...');
-      pages.push(total);
+      pages.push('...'); pages.push(total);
     } else if (current >= total - 3) {
-      pages.push(1);
-      pages.push('...');
+      pages.push(1); pages.push('...');
       for (let i = total - 4; i <= total; i++) pages.push(i);
     } else {
-      pages.push(1);
-      pages.push('...');
+      pages.push(1); pages.push('...');
       for (let i = current - 1; i <= current + 1; i++) pages.push(i);
-      pages.push('...');
-      pages.push(total);
+      pages.push('...'); pages.push(total);
     }
     return pages;
   }
@@ -244,9 +310,13 @@
     articleView.style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    articleBody.innerHTML = '<p style="color:#888;font-family:Rajdhani,sans-serif;letter-spacing:.15em;">LOADING...</p>';
-    articleMeta.innerHTML = '';
-    articleNav.innerHTML  = '';
+    articleBody.innerHTML   = '<p style="color:#888;font-family:Rajdhani,sans-serif;letter-spacing:.15em;">LOADING...</p>';
+    articleMeta.innerHTML   = '';
+    articleNav.innerHTML    = '';
+    articleActions.innerHTML= '';
+
+    // 閲覧数カウント
+    incrementViews(post.file);
 
     try {
       const res = await fetch(`posts/${post.file}`);
@@ -260,11 +330,66 @@
         <div class="art-date">${formatDate(meta.date || post.date)}</div>`;
 
       articleBody.innerHTML = marked.parse(body);
+
+      renderArticleActions(post, meta);
       renderArticleNav(index);
 
     } catch (e) {
       articleBody.innerHTML = `<p style="color:#c00">記事の読み込みに失敗しました：${e.message}</p>`;
     }
+  }
+
+  /* ============================================================
+     記事アクションバー（いいね・閲覧数・Twitterシェア）
+     ============================================================ */
+  function renderArticleActions(post, meta) {
+    const rec   = getRecord(post.file);
+    const title = meta.title || post.title;
+    const url   = encodeURIComponent(location.href);
+    const text  = encodeURIComponent(`${title} - THRCOT ROBOTICS™ @Thrcot_RCJ\n`);
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+
+    articleActions.innerHTML = `
+      <span class="action-stat">${ICONS.eye}<span id="viewCount">${fmtNum(rec.views)}</span> VIEWS</span>
+      <div class="action-sep"></div>
+      <span class="action-stat">${ICONS.heart}<span id="likeCount">${fmtNum(rec.likes)}</span> LIKES</span>
+      <div class="action-spacer"></div>
+      <button class="like-btn${rec.liked ? ' liked' : ''}" id="likeBtn">
+        <svg class="like-heart" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                   2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+                   C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
+                   c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        ${rec.liked ? 'LIKED' : 'LIKE'}
+      </button>
+      <a class="share-btn" href="${tweetUrl}" target="_blank" rel="noopener">
+        ${ICONS.x.replace('<svg', '<svg class="share-icon"')}SHARE
+      </a>`;
+
+    // いいねボタンのイベント
+    const likeBtn   = document.getElementById('likeBtn');
+    const likeCount = document.getElementById('likeCount');
+
+    likeBtn.addEventListener('click', () => {
+      const r = getRecord(post.file);
+      const nowLiked = !r.liked;
+      const newCount = r.likes + (nowLiked ? 1 : -1);
+      setRecord(post.file, { liked: nowLiked, likes: Math.max(0, newCount) });
+
+      likeBtn.classList.toggle('liked', nowLiked);
+      likeBtn.classList.remove('pop');
+      void likeBtn.offsetWidth; // reflow でアニメーションリセット
+      likeBtn.classList.add('pop');
+
+      // ラベル更新（SVGは維持）
+      likeBtn.childNodes[likeBtn.childNodes.length - 1].textContent = nowLiked ? 'LIKED' : 'LIKE';
+      likeCount.textContent = fmtNum(Math.max(0, newCount));
+    });
+
+    // 閲覧数を再取得して表示更新
+    const viewCount = document.getElementById('viewCount');
+    viewCount.textContent = fmtNum(getRecord(post.file).views);
   }
 
   /* ============================================================
@@ -296,7 +421,26 @@
   backBtn.addEventListener('click', () => {
     articleView.style.display = 'none';
     listView.style.display    = 'block';
+    renderList(); // カードのいいね・閲覧数を再描画
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ============================================================
+     並べ替えコントロール
+     ============================================================ */
+  sortKeyEl.addEventListener('change', () => {
+    sortKey     = sortKeyEl.value;
+    currentPage = 1;
+    renderList();
+  });
+
+  sortDirEl.addEventListener('click', () => {
+    sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+    sortDirEl.dataset.dir = sortDir;
+    sortDirEl.classList.toggle('asc', sortDir === 'asc');
+    sortDirEl.title = sortDir === 'desc' ? '降順' : '昇順';
+    currentPage = 1;
+    renderList();
   });
 
   /* ============================================================
