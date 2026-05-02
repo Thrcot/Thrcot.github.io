@@ -19,7 +19,7 @@
   const POSTS_PER_PAGE = 12;
 
   const SUPABASE_URL  = 'https://xtbjbnifcxurudzbgoxk.supabase.co';
-  const SUPABASE_ANON = 'sb_publishable_uL-wGAOMd5STLBLZgzXqvw_Q6cV1Pjh';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0YmpibmlmY3h1cnVkemJnb3hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NDQ3MjUsImV4cCI6MjA5MzEyMDcyNX0.TzouIKCvWbxvQjjy3GRJe8SQ1SGKu0EushvtVg07FJ0';
 
   const useSupabase = !!(SUPABASE_URL && SUPABASE_ANON);
 
@@ -86,7 +86,22 @@
     } catch (e) { console.warn('Supabase batch load failed:', e.message); }
   }
 
-  /* upsert（INSERT or UPDATE） */
+  /* ── 常にDBから最新値を取得してから書き込む（上書きリセット防止） ── */
+  async function sbGetFresh(file) {
+    try {
+      const rows = await sbFetch(
+        `blog_stats?file=eq.${encodeURIComponent(file)}&select=views,likes`
+      );
+      if (rows && rows.length > 0) {
+        statsCache[file] = { views: rows[0].views, likes: rows[0].likes };
+        return statsCache[file];
+      }
+    } catch {}
+    // レコードなし → デフォルト（まだ一度も記録されていない記事）
+    return statsCache[file] || { views: 0, likes: 0 };
+  }
+
+  /* upsert（INSERT or UPDATE） — キャッシュも同時に更新 */
   async function sbUpsert(file, views, likes) {
     statsCache[file] = { views, likes };
     try {
@@ -130,9 +145,9 @@
     sessionStorage.setItem(sessionKey, '1');
 
     if (useSupabase) {
-      const cur = statsCache[file] || { views: 0, likes: 0 };
-      const newViews = cur.views + 1;
-      await sbUpsert(file, newViews, cur.likes);
+      // ★ 必ずDBから最新値を取得してからインクリメント（キャッシュ起点だとリセットされる）
+      const fresh = await sbGetFresh(file);
+      await sbUpsert(file, fresh.views + 1, fresh.likes);
     } else {
       const r = lsGet(file);
       lsSet(file, { views: r.views + 1 });
@@ -145,9 +160,10 @@
     setLiked(file, nowLiked);
 
     if (useSupabase) {
-      const cur = statsCache[file] || { views: 0, likes: 0 };
-      const newLikes = Math.max(0, cur.likes + (nowLiked ? 1 : -1));
-      await sbUpsert(file, cur.views, newLikes);
+      // ★ 必ずDBから最新値を取得してからいいね数を増減（キャッシュ起点だとリセットされる）
+      const fresh = await sbGetFresh(file);
+      const newLikes = Math.max(0, fresh.likes + (nowLiked ? 1 : -1));
+      await sbUpsert(file, fresh.views, newLikes);
       return { liked: nowLiked, likes: newLikes };
     } else {
       const r = lsGet(file);
