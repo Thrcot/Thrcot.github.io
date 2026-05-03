@@ -401,11 +401,21 @@
   }
 
   /* ============================================================
-     記事を開く
+     記事を開く（URLハッシュ更新付き）
+     pushHistory=true のとき history.pushState でURLを変える
+     popstate から呼ばれるときは false にして二重pushを防ぐ
      ============================================================ */
-  async function openArticle(index) {
+  async function openArticle(index, pushHistory = true) {
     currentIndex = index;
     const post = allPosts[index];
+
+    // URL を blog.html#ファイルパス に更新
+    if (pushHistory) {
+      history.pushState({ file: post.file }, '', `#${post.file}`);
+    }
+
+    // ページタイトルを記事タイトルに変更
+    document.title = `${post.title} — Thrcot Robotics™`;
 
     listView.style.display    = 'none';
     articleView.style.display = 'block';
@@ -518,11 +528,35 @@
   /* ============================================================
      一覧に戻る
      ============================================================ */
-  backBtn.addEventListener('click', () => {
+  function showList() {
     articleView.style.display = 'none';
     listView.style.display    = 'block';
+    document.title = 'BLOG — Thrcot Robotics™';
     renderList();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  backBtn.addEventListener('click', () => {
+    history.pushState(null, '', location.pathname); // ハッシュをクリア
+    showList();
+  });
+
+  /* ============================================================
+     ブラウザの戻る/進むボタン対応
+     ============================================================ */
+  window.addEventListener('popstate', () => {
+    const hash = location.hash.slice(1); // '#' を除去
+    if (!hash) {
+      showList();
+      return;
+    }
+    // ハッシュからファイル名で記事を探す
+    const index = allPosts.findIndex(p => p.file === hash);
+    if (index !== -1) {
+      openArticle(index, false); // pushHistory=false（popstateなので履歴追加しない）
+    } else {
+      showList();
+    }
   });
 
   /* ============================================================
@@ -557,11 +591,13 @@
 
       renderList();
 
-      const hash  = location.hash;
-      const match = hash.match(/^#post-(\d+)$/);
-      if (match) {
-        const i = parseInt(match[1]);
-        if (i >= 0 && i < allPosts.length) openArticle(i);
+      // ハッシュが #ファイルパス 形式なら直接その記事を開く
+      const hash = location.hash.slice(1); // '#' を除去
+      if (hash) {
+        const index = allPosts.findIndex(p => p.file === hash);
+        if (index !== -1) {
+          openArticle(index, false); // 初回はpushStateしない（すでにURLにある）
+        }
       }
 
     } catch (e) {
