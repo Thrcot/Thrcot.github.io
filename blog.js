@@ -401,21 +401,11 @@
   }
 
   /* ============================================================
-     記事を開く（URLハッシュ更新付き）
-     pushHistory=true のとき history.pushState でURLを変える
-     popstate から呼ばれるときは false にして二重pushを防ぐ
+     記事を開く
      ============================================================ */
-  async function openArticle(index, pushHistory = true) {
+  async function openArticle(index) {
     currentIndex = index;
     const post = allPosts[index];
-
-    // URL を blog.html#ファイルパス に更新
-    if (pushHistory) {
-      history.pushState({ file: post.file }, '', `#${post.file}`);
-    }
-
-    // ページタイトルを記事タイトルに変更
-    document.title = `${post.title} — Thrcot Robotics™`;
 
     listView.style.display    = 'none';
     articleView.style.display = 'block';
@@ -436,8 +426,11 @@
 
       // authorはMDフロントマター優先、なければindex.jsonの値を使用
       const authorKey = meta.author || post.author || '';
+      // サムネはMDフロントマター優先、なければindex.jsonの値を使用
+      const thumb = meta.thumbnail || post.thumbnail || '';
 
       articleMeta.innerHTML = `
+        ${thumb ? `<div class="art-thumb"><img src="${thumb}" alt="${meta.title || post.title}" onerror="this.parentElement.style.display='none'"></div>` : ''}
         ${meta.category ? `<div class="art-cat">${meta.category}</div>` : ''}
         <div class="art-title">${meta.title || post.title}</div>
         <div class="art-meta-row">
@@ -528,35 +521,11 @@
   /* ============================================================
      一覧に戻る
      ============================================================ */
-  function showList() {
+  backBtn.addEventListener('click', () => {
     articleView.style.display = 'none';
     listView.style.display    = 'block';
-    document.title = 'BLOG — Thrcot Robotics™';
     renderList();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  backBtn.addEventListener('click', () => {
-    history.pushState(null, '', location.pathname); // ハッシュをクリア
-    showList();
-  });
-
-  /* ============================================================
-     ブラウザの戻る/進むボタン対応
-     ============================================================ */
-  window.addEventListener('popstate', () => {
-    const hash = location.hash.slice(1); // '#' を除去
-    if (!hash) {
-      showList();
-      return;
-    }
-    // ハッシュからファイル名で記事を探す
-    const index = allPosts.findIndex(p => p.file === hash);
-    if (index !== -1) {
-      openArticle(index, false); // pushHistory=false（popstateなので履歴追加しない）
-    } else {
-      showList();
-    }
   });
 
   /* ============================================================
@@ -591,13 +560,11 @@
 
       renderList();
 
-      // ハッシュが #ファイルパス 形式なら直接その記事を開く
-      const hash = location.hash.slice(1); // '#' を除去
-      if (hash) {
-        const index = allPosts.findIndex(p => p.file === hash);
-        if (index !== -1) {
-          openArticle(index, false); // 初回はpushStateしない（すでにURLにある）
-        }
+      const hash  = location.hash;
+      const match = hash.match(/^#post-(\d+)$/);
+      if (match) {
+        const i = parseInt(match[1]);
+        if (i >= 0 && i < allPosts.length) openArticle(i);
       }
 
     } catch (e) {

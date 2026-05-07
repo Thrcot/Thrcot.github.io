@@ -564,6 +564,29 @@
   color: var(--gray);
 }
 
+/* ── 記事サムネ ── */
+.art-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  overflow: hidden;
+  margin-bottom: 28px;
+  border: var(--border);
+  background: var(--black);
+}
+
+.art-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(15%);
+  transition: filter 0.4s;
+}
+
+.art-thumb:hover img {
+  filter: grayscale(0%);
+}
+
 /* ── MARKDOWN レンダリング ── */
 .article-body {
   font-size: 0.97rem;
