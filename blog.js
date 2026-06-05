@@ -56,9 +56,7 @@
   /* ── Supabase カウントキャッシュ ── */
   const statsCache = {};  // { [file]: { views, likes } }
 
-  /* ============================================================
-     Supabase ヘルパー
-     ============================================================ */
+/* ── Supabase ヘルパー ── */
   async function sbFetch(path, opts = {}) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
       ...opts,
@@ -113,9 +111,7 @@
     } catch (e) { console.warn('Supabase upsert failed:', e.message); }
   }
 
-  /* ============================================================
-     localStorage フォールバック
-     ============================================================ */
+  /* ── LocalStorage フォールバック ── */
   const LS_KEY = 'thrcot_blog';
 
   function lsLoad()    { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } }
@@ -145,7 +141,7 @@
     sessionStorage.setItem(sessionKey, '1');
 
     if (useSupabase) {
-      // ★ 必ずDBから最新値を取得してからインクリメント（キャッシュ起点だとリセットされる）
+      // 必ずDBから最新値を取得してからインクリメント（キャッシュ起点だとリセットされる）
       const fresh = await sbGetFresh(file);
       await sbUpsert(file, fresh.views + 1, fresh.likes);
     } else {
@@ -160,7 +156,7 @@
     setLiked(file, nowLiked);
 
     if (useSupabase) {
-      // ★ 必ずDBから最新値を取得してからいいね数を増減（キャッシュ起点だとリセットされる）
+      // 必ずDBから最新値を取得してからいいね数を増減（キャッシュ起点だとリセットされる）
       const fresh = await sbGetFresh(file);
       const newLikes = Math.max(0, fresh.likes + (nowLiked ? 1 : -1));
       await sbUpsert(file, fresh.views, newLikes);
@@ -173,9 +169,7 @@
     }
   }
 
-  /* ============================================================
-     フロントマター解析
-     ============================================================ */
+  /* ── フロントマター解析 ── */
   function parseFrontmatter(raw) {
     const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
     if (!match) return { meta: {}, body: raw };
@@ -187,9 +181,7 @@
     return { meta, body: match[2] };
   }
 
-  /* ============================================================
-     ユーティリティ
-     ============================================================ */
+  /* ── ユーティリティ ── */
   function formatDate(str) {
     const d = new Date(str);
     if (isNaN(d)) return str;
@@ -201,9 +193,7 @@
     return String(n);
   }
 
-  /* ============================================================
-     SVG アイコン
-     ============================================================ */
+  /* ── アイコン定義 ── */
   const ICONS = {
     heart: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
     eye:   `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`,
@@ -211,9 +201,7 @@
     xLogo: `<svg viewBox="0 0 1200 1227" xmlns="http://www.w3.org/2000/svg"><path d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284zM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854z"/></svg>`,
   };
 
-  /* ============================================================
-     著者バッジ HTML
-     ============================================================ */
+/* ── 著者バッジ ── */
   function authorBadgeHtml(authorKey) {
     const m = MEMBERS[authorKey];
     if (!m) return '';
@@ -237,9 +225,7 @@
     </div>`;
   }
 
-  /* ============================================================
-     フィルターボタン生成
-     ============================================================ */
+/* ── フィルター ── */
   function buildFilters(posts) {
     const cats = [...new Set(posts.map(p => p.category).filter(Boolean))];
     cats.forEach(cat => {
@@ -261,9 +247,7 @@
     renderList();
   }
 
-  /* ============================================================
-     並べ替え（Supabase時はキャッシュ値、localStorage時はlsから）
-     ============================================================ */
+/* ── ソート ── */
   function getSortedFiltered() {
     let posts = currentCat === 'all'
       ? [...allPosts]
@@ -283,9 +267,7 @@
     return posts;
   }
 
-  /* ============================================================
-     記事一覧レンダリング
-     ============================================================ */
+/* ── 記事一覧 ── */
   function renderList() {
     const filtered   = getSortedFiltered();
     const totalPages = Math.ceil(filtered.length / POSTS_PER_PAGE);
@@ -343,9 +325,7 @@
     renderPagination(totalPages, currentPage);
   }
 
-  /* ============================================================
-     ページネーション
-     ============================================================ */
+/* ── パージネーション ── */
   function renderPagination(totalPages, page) {
     const old = document.getElementById('pagination');
     if (old) old.remove();
@@ -400,9 +380,7 @@
     return pages;
   }
 
-  /* ============================================================
-     記事を開く
-     ============================================================ */
+/* ── 記事 ── */
   async function openArticle(index) {
     currentIndex = index;
     const post = allPosts[index];
@@ -447,9 +425,7 @@
     }
   }
 
-  /* ============================================================
-     記事アクションバー（閲覧数・いいね・Xシェア）
-     ============================================================ */
+/* ── 記事アクション ── */
   function renderArticleActions(post, meta, authorKey) {
     const st    = getStats(post.file);
     const liked = isLiked(post.file);
@@ -497,9 +473,7 @@
     });
   }
 
-  /* ============================================================
-     前後記事ナビ
-     ============================================================ */
+/* ── 記事ナビ ── */
   function renderArticleNav(index) {
     const prev = index + 1 < allPosts.length ? allPosts[index + 1] : null;
     const next = index - 1 >= 0             ? allPosts[index - 1] : null;
@@ -518,9 +492,7 @@
     if (next) articleNav.querySelector('.next').addEventListener('click', () => openArticle(index - 1));
   }
 
-  /* ============================================================
-     一覧に戻る
-     ============================================================ */
+/* ── 戻る ── */
   backBtn.addEventListener('click', () => {
     articleView.style.display = 'none';
     listView.style.display    = 'block';
@@ -528,9 +500,7 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  /* ============================================================
-     並べ替えコントロール
-     ============================================================ */
+/* ── ソート ── */
   sortKeyEl.addEventListener('change', () => { sortKey = sortKeyEl.value; currentPage = 1; renderList(); });
   sortDirEl.addEventListener('click', () => {
     sortDir = sortDir === 'desc' ? 'asc' : 'desc';
@@ -540,10 +510,7 @@
     currentPage = 1;
     renderList();
   });
-
-  /* ============================================================
-     初期化
-     ============================================================ */
+/* ── 初期化 ── */
   async function init() {
     blogGrid.innerHTML = '<div class="blog-loading">LOADING POSTS...</div>';
     try {

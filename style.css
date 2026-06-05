@@ -1,7 +1,3 @@
-/* ============================================================
-   style.css — Thrcot Robotics
-   ============================================================ */
-
 /* ── RESET ── */
 *, *::before, *::after {
   margin: 0;
@@ -36,9 +32,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
+/* ── HEADER ── */
 header {
   position: fixed;
   top: 0;
@@ -141,7 +135,7 @@ nav#globalNav a:hover {
   transition: transform 0.3s, opacity 0.3s;
 }
 
-/* ハンバーガー → ✕ */
+/* ハンバーガー */
 .nav-toggle.open span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
@@ -152,9 +146,7 @@ nav#globalNav a:hover {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* ============================================================
-   HERO
-   ============================================================ */
+/* ── HERO ── */
 .hero {
   position: relative;
   color: var(--white);
@@ -280,9 +272,7 @@ nav#globalNav a:hover {
   z-index: 1;
 }
 
-/* ============================================================
-   DIVIDER
-   ============================================================ */
+/* ── DIVIDER ── */
 .divider {
   height: 72px;
   background: var(--black);
@@ -294,9 +284,7 @@ nav#globalNav a:hover {
   clip-path: polygon(0 0, 100% 45%, 100% 100%, 0 100%);
 }
 
-/* ============================================================
-   SECTION 共通
-   ============================================================ */
+/* ── SECTION ── */
 .section-wrap {
   padding: 100px 48px;
   max-width: 1200px;
@@ -329,9 +317,7 @@ h2 {
   margin-bottom: 4px;
 }
 
-/* ============================================================
-   ABOUT
-   ============================================================ */
+/* ── ABOUT ── */
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -387,9 +373,7 @@ h2 {
   color: var(--gray);
 }
 
-/* ============================================================
-   ROBOTS
-   ============================================================ */
+/* ── ROBOTS ── */
 .robots-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -485,9 +469,7 @@ h2 {
   letter-spacing: 0.03em;
 }
 
-/* ============================================================
-   SPONSORS
-   ============================================================ */
+/* ── SPONSORS ── */
 .sponsor-tier {
   margin-bottom: 3rem;
 }
@@ -611,9 +593,7 @@ h2 {
   color: var(--black);
 }
 
-/* ============================================================
-   LINKS
-   ============================================================ */
+/* ── LINKS ── */
 .links-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -669,9 +649,7 @@ h2 {
   color: rgba(255, 255, 255, 0.3);
 }
 
-/* ============================================================
-   FOOTER
-   ============================================================ */
+/* ── FOOTER ── */
 .site-footer {
   position: relative;
   background: var(--black);
@@ -763,9 +741,7 @@ h2 {
   user-select: none;
 }
 
-/* ============================================================
-   FADE アニメーション
-   ============================================================ */
+/* ── FADE ANIMATION ── */
 .fade {
   opacity: 0;
   transform: translateY(36px);
@@ -781,9 +757,7 @@ h2 {
 .fade-delay-2 { transition-delay: 0.2s; }
 .fade-delay-3 { transition-delay: 0.3s; }
 
-/* ============================================================
-   RESPONSIVE — Tablet（〜1024px）
-   ============================================================ */
+/* ── RESPONSIVE 1024px ── */
 @media (max-width: 1024px) {
   header {
     padding: 0 32px;
@@ -828,9 +802,7 @@ h2 {
   }
 }
 
-/* ============================================================
-   RESPONSIVE — Smartphone（〜768px）
-   ============================================================ */
+/* ── RESPONSIVE 768px ── */
 @media (max-width: 768px) {
   /* ── ヘッダー ── */
   header {
@@ -879,7 +851,7 @@ h2 {
     border-right: none;
   }
 
-  /* ── ヒーロー ── */
+  /* ── HERO ── */
   .hero {
     padding: 80px 24px 60px;
     min-height: 100svh;
@@ -908,7 +880,7 @@ h2 {
     right: -20px;
   }
 
-  /* ── セクション ── */
+  /* ── SECTION ── */
   .section-wrap {
     padding: 64px 20px;
   }
@@ -974,9 +946,7 @@ h2 {
   }
 }
 
-/* ============================================================
-   RESPONSIVE — Small Smartphone（〜480px）
-   ============================================================ */
+/* ── RESPONSIVE 480px ── */
 @media (max-width: 480px) {
   .hero h1 {
     font-size: clamp(2rem, 14vw, 2.8rem);
